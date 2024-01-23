@@ -24,7 +24,7 @@ This correction enhances the performance of kOmegaSST turbulence model in
 capturing the separation flow and secondary flow:
 - **Separation** Flow: specifically optimized for separation after bumps or for cases with high adverse pressure gradient
   including periodic hills, curved backward-facing step, converging-diverging channel, and parametric bumps.
-- **Secondary** Flow: specifically the Prandtl's second kind of secondary flow (aka corner flow) induced by Reynolds stress tensor.
+- **Secondary** Flow: specifically the Prandtl's second kind of secondary flow (aka corner flow) induced by heterogenities of the Reynolds stresses.
 
 
  
@@ -32,10 +32,10 @@ The implementation of the augmented model has been optimized for 2D cases but
 its applicability has been tested on 3D flows, yielding similar results.
 Five coefficients can be modified by the user to change the model's performance. 
 Standard optimised values are given by default in the model.
-More information is available in the publication listed at the of this file.
+More information is available in the publications listed at the end of this file.
 
 ## Target platform
-The code is known to work with OpenFOAM v2312 and previous ESI versions.
+The code is known to work with OpenFOAM-v2312 and previous ESI versions.
 
 ## Authors
 Ali Amarloo <amarloo@mpe.au.dk>
