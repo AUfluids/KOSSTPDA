@@ -114,7 +114,7 @@ Results for a duct flow of aspect ratio 1 at bulk Reynolds number 3500 for Model
 
 For more details about the separation and secondary flow effects, refer to the publications at: 
  - [Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization](https://doi.org/10.1063/5.0174470)
- - [Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation](https://www.researchgate.net/publication/376972302_Progressive_augmentation_of_turbulence_models_for_flow_separation_by_multi-case_computational_fluid_dynamics_driven_surrogate_optimization)
+ - [Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation]([https://www.researchgate.net/publication/376972302_Progressive_augmentation_of_turbulence_models_for_flow_separation_by_multi-case_computational_fluid_dynamics_driven_surrogate_optimization](https://doi.org/10.1016/j.ijheatfluidflow.2023.109242)
 
 
 ## How to cite
