@@ -102,10 +102,6 @@ Results of using KOSSTPDA for curved backward-facing step with bulk Reynolds num
 ![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/contours_comparisonCBFS.png)
 ![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/quantitative_comparison_CBFS.png)
 
-For more details about the separation effect, refer to the publication at: 
-[Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization](https://doi.org/10.1063/5.0174470)
-or [ResearchGate]([https://arxiv.org/abs/2308.12720](https://www.researchgate.net/publication/376972302_Progressive_augmentation_of_turbulence_models_for_flow_separation_by_multi-case_computational_fluid_dynamics_driven_surrogate_optimization).
-
 
 ## Test results of the secondary effect
 
@@ -113,11 +109,16 @@ Results for a duct flow of aspect ratio 1 at bulk Reynolds number 3500 for Model
 ![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_u.png)
 ![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_profiles.png)
 
-For more details about the secondary effect, refer to the publication at: 
-[Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation](https://doi.org/10.1016/j.ijheatfluidflow.2023.109242)
-or [arXiv](https://arxiv.org/abs/2308.12720)
+
+## References
+
+For more details about the separation and secondary flow effects, refer to the publications at: 
+ - [Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization](https://doi.org/10.1063/5.0174470)
+ - [Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation](https://www.researchgate.net/publication/376972302_Progressive_augmentation_of_turbulence_models_for_flow_separation_by_multi-case_computational_fluid_dynamics_driven_surrogate_optimization)
+
 
 ## How to cite
+
 Please, cite this library using the following two publications: 
 
 Amarloo and Rincón (2023):
