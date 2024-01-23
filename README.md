@@ -69,6 +69,7 @@ NOTE: You might have to define the bijDelta term in system/fvSchemes file, here 
          }
 
 5. (Optional) By default, the model activates both secondary and separation effects. If desired, one can change the models as follows: 
+
          separationMode      4; //optional - default:4 - off:0 | ModelI:1 | ModelII:2 | ModelIII:3 | ModelIV:4
          secondaryMode       2; //optional - default:2 - off:0 | ModelI:1 | ModelII:2
    
