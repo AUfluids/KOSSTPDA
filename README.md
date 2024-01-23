@@ -80,15 +80,17 @@ For info about the differences within these models, users are referred to the pu
    Otherwise, these coefficients are automatically assigned with values corresponding to the models. 
 
            //Separation Flow coefficients
-            separationLambda1   1;              //optional - default taken from separationMode 4
-            separationLambda2   1;              //optional - default taken from separationMode 4
-            C0                  -1;             //optional - default taken from separationMode 4
-            C1                  0;              //optional - default taken from separationMode 4
-            C2                  0;              //optional - default taken from separationMode 4
+            separationMode      1; 
+            separationLambda1   1;              
+            separationLambda2   1;              
+            C0                  -1;             
+            C1                  0;             
+            C2                  0;             
             //Secodnary Flow coefficients
-            A0                  -1;             //optional - default taken from secondaryMode 2
-            A1                  0;              //optional - default taken from secondaryMode 2
-            A2                  0;              //optional - default taken from secondaryMode 2
+            secondaryMode       1; 
+            A0                  -1;             
+            A1                  0;              
+            A2                  0;             
 
 
 
