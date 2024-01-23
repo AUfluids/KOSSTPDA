@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.7.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//Ubar            Ubar [ 0 1 -1 0 0 0 0 ] ( 0.72 0 0 );
+
+transportModel  Newtonian;
+
+// ro = 1 kg/m3
+// mu = 2e-5 kg/m/s
+
+nu              nu [ 0 2 -1 0 0 0 0 ] 7.299270072992701e-05;//Re_H=13700
+
+// ************************************************************************* //
