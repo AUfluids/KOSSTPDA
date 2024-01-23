@@ -118,7 +118,7 @@ For more details about the secondary effect, refer to the publication at:
 or [arXiv](https://arxiv.org/abs/2308.12720)
 
 ## How to cite
-Please, cite this library using the following publications: 
+Please, cite this library using the following two publications: 
 
 Amarloo and Rincón (2023):
 
