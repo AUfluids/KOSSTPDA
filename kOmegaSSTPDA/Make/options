@@ -1,4 +1,3 @@
-sinclude $(GENERAL_RULES)/module-path-user
 
 /* Failsafe - user location */
 ifeq (,$(strip $(FOAM_MODULE_APPBIN)))
@@ -9,7 +8,7 @@ ifeq (,$(strip $(FOAM_MODULE_LIBBIN)))
 endif
 
 
-include ./versionRules/libraryRules
+
 include $(GENERAL_RULES)/module-path-user
 
 
