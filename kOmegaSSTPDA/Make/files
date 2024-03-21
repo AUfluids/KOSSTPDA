@@ -16,4 +16,4 @@ include $(GENERAL_RULES)/module-path-user
 
 myTurbulentTransportModels.C
 
-LIB = $(FOAM_USER_LIBBIN)/libPDAIncompressibleTurbulenceModels
+LIB = $(FOAM_MODULE_LIBBIN)/libPDAIncompressibleTurbulenceModels
