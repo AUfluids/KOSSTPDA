@@ -5,5 +5,5 @@ cd "${0%/*}" || exit                                # Run from this directory
 #------------------------------------------------------------------------------
 
 
-cd kOmegaSSTPDA
+cd ./kOmegaSSTPDA
 wmake
