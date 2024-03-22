@@ -4,3 +4,5 @@ cd "${0%/*}" || exit
 
 cd ./kOmegaSSTPDA
 wclean
+cd ../kOmegaSSTPDA_compressible
+wclean

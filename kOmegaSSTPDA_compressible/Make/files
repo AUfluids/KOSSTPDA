@@ -1,0 +1,3 @@
+myTurbulentFluidThermoModels.C
+
+LIB = $(FOAM_MODULE_LIBBIN)/libPDAcompressibleTurbulenceModels
