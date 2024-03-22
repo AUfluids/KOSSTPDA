@@ -47,15 +47,18 @@ Mario Javier Rincón <mjrp@mpe.au.dk>
 
          git clone https://github.com/AUfluids/KOSSTPDA.git
 
-2. Enter the directory where the source code has been extracted, and compile it by typing: 
+2. Compile the model by the following command: 
 
-         wmake
+         .\Allwmake
 
-3. Add the following line to the _controlDict_ of your case:
+3.1. Add the following line to the _controlDict_ of your case (for incompressible flow):
 
-         libs ( "libPDAIncompressibleTurbulenceModels" ) ;
+         libs ( "libPDAIncompressibleTurbulenceModels" );
+3.2. In case of compressible flow, add the following line to the _controlDict_ of your case:
 
-4. Specify the following in _turbulentProperties_.
+         libs ( "libPDAcompressibleTurbulenceModels" );
+
+5. Specify the following in _turbulentProperties_.
 
          RASModel kOmegaSSTPDA;
    
