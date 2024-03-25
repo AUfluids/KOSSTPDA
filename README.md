@@ -52,14 +52,14 @@ Mario Javier Rincón <mjrp@mpe.au.dk>
          cd KOSSTPDA
          chmod a+x Allwmake
    
-2. Compile the model by the following command: 
+3. Compile the model by the following command: 
 
          .\Allwmake
 
-3.1. Add the following line to the _controlDict_ of your case (for incompressible flow):
+4.1. Add the following line to the _controlDict_ of your case (for incompressible flow):
 
          libs ( "libPDAIncompressibleTurbulenceModels" );
-3.2. In case of compressible flow, add the following line to the _controlDict_ of your case:
+4.2. In case of compressible flow, add the following line to the _controlDict_ of your case:
 
          libs ( "libPDAcompressibleTurbulenceModels" );
 
@@ -76,7 +76,7 @@ NOTE: You might have to define the bijDelta term in system/fvSchemes file, here 
                   div(dev(((2*k)*bijDelta)))          Gauss linear;
          }
 
-5. (Optional) By default, the model activates both secondary and separation effects. If desired, one can change the models as follows: 
+6. (Optional) By default, the model activates both secondary and separation effects. If desired, one can change the models as follows: 
 
          separationMode      4; //optional - default:4 - off:0 | ModelI:1 | ModelII:2 | ModelIII:3 | ModelIV:4
          secondaryMode       2; //optional - default:2 - off:0 | ModelI:1 | ModelII:2
@@ -84,7 +84,7 @@ NOTE: You might have to define the bijDelta term in system/fvSchemes file, here 
 If you use 0, the extra effects are deactivated, and the standard kOmegaSST is used.
 For info about the differences within these models, users are referred to the publications corresponding to the development of the each model (can be found at the end of the document)
    
-6. (Optional) In case of stability and convergence issues, we also suggest the following setting for the new model to be tested.
+7. (Optional) In case of stability and convergence issues, we also suggest the following setting for the new model to be tested.
    Otherwise, these coefficients are automatically assigned with values corresponding to the models. 
 
            //Separation Flow coefficients
