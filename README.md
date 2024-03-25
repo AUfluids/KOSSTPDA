@@ -47,6 +47,11 @@ Mario Javier Rincón <mjrp@mpe.au.dk>
 
          git clone https://github.com/AUfluids/KOSSTPDA.git
 
+2. Depends on your system, you might need to make the _Allwmake_ file executable with the following commands:
+   
+         cd KOSSTPDA
+         chmod a+x Allwmake
+   
 2. Compile the model by the following command: 
 
          .\Allwmake
