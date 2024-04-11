@@ -1,0 +1,10 @@
+#!/bin/sh
+cd "${0%/*}" || exit
+#------------------------------------------------------------------------------
+
+wclean kOmegaSSTPDA
+wclean kOmegaSSTPDA_compressible
+
+rm -f foamVersionThisIsCompiledFor
+
+#------------------------------------------------------------------------------
