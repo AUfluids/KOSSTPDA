@@ -28,14 +28,14 @@ License
     Progressive data augmented (PDA) 2023, A. Amarloo, M. Rincon
 
     More details and test cases in following publications:
-    A. Amarloo, M. J. Rincon, M. Reclari, and M. Abkar, 
+    A. Amarloo, M. J. Rincon, M. Reclari, and M. Abkar,
     "Progressive augmentation of RANS models for separated flow prediction
     by CFD-driven surrogate multi-objective optimisation." (2023).
     and
-    M. J. Rincon, A. Amarloo,  M. Reclari, X.I.A. Yang, and M. Abkar, 
-    "Progressive augmentation of Reynolds stress tensor models for secondary flow prediction 
+    M. J. Rincon, A. Amarloo,  M. Reclari, X.I.A. Yang, and M. Abkar,
+    "Progressive augmentation of Reynolds stress tensor models for secondary flow prediction
     by computational fluid dynamics driven surrogate optimisation" (2023).
-    
+
     The model coefficients  are
     \verbatim
         kOmegaSSTPDABaseCoeffs
@@ -513,7 +513,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         0.0*(((2.0/3.0)*I)*k_ - this->nut_*twoSymm(fvc::grad(this->U_)))
     ),
     secondary_relaxation_
-    (   
+    (
         dimensioned<scalar>::getOrAddToDict
         (
             "secondary_relaxation",
@@ -723,23 +723,23 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
 // New calculations
 
-    volTensorField gradU = fvc::grad(U);
-    volSymmTensorField Sij = symm(gradU);
-    volTensorField Oij = -0.5*(gradU - gradU.T());
-    volScalarField S = sqrt(2*magSqr(symm(fvc::grad(U))));
+    volTensorField gradU(fvc::grad(U));
+    volSymmTensorField Sij(symm(gradU));
+    volTensorField Oij(-0.5*(gradU - gradU.T()));
+    volScalarField S(sqrt(2*magSqr(symm(fvc::grad(U)))));
 
-    volScalarField tScale = 1./max( S/a1_ + this->omegaMin_,omega_ + this->omegaMin_);
-    volScalarField tScale2 = tScale*tScale;
-    volScalarField tScale3 = tScale*tScale2;
-    volScalarField tScale4 = tScale*tScale3;
+    volScalarField tScale(1./max( S/a1_ + this->omegaMin_,omega_ + this->omegaMin_));
+    volScalarField tScale2(tScale*tScale);
+    volScalarField tScale3(tScale*tScale2);
+    volScalarField tScale4(tScale*tScale3);
 
-    volScalarField i1_ = tScale2 * tr(Sij & Sij);
-    volScalarField i2_ = tScale2 * tr(Oij & Oij);
-    volScalarField i3_ = tScale3 * tr((Sij & Sij) & Sij);
-    volScalarField i4_ = tScale3 * tr((Oij & Oij) & Sij);
-    volScalarField i5_ = tScale4 * tr((Oij & Oij) & (Sij & Sij));
-    volSymmTensorField T2_ = tScale2 * symm((Sij & Oij) - (Oij & Sij));
-    
+    volScalarField i1_(tScale2 * tr(Sij & Sij));
+    volScalarField i2_(tScale2 * tr(Oij & Oij));
+    volScalarField i3_(tScale3 * tr((Sij & Sij) & Sij));
+    volScalarField i4_(tScale3 * tr((Oij & Oij) & Sij));
+    volScalarField i5_(tScale4 * tr((Oij & Oij) & (Sij & Sij)));
+    volSymmTensorField T2_(tScale2 * symm((Sij & Oij) - (Oij & Sij)));
+
     forAll(Sij, CellI)
     {
         i1_[CellI] = tScale2[CellI] * tr(Sij[CellI] & Sij[CellI]);
@@ -749,28 +749,28 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
         i5_[CellI] = tScale4[CellI] * tr((Oij[CellI] & Oij[CellI]) & (Sij[CellI] & Sij[CellI]));
         T2_[CellI] = tScale2[CellI] * symm((Sij[CellI] & Oij[CellI]) - (Oij[CellI] & Sij[CellI]));
     }
-    
+
 
     dimensionedScalar nutMin("nutMin", dimensionSet(0, 2, -1, 0, 0, 0 ,0), 1e-9);
 
-    volScalarField alpha1_separation = i1_ * 0.0;
+    volScalarField alpha1_separation(i1_ * 0.0);
 
     // Separation Factor
 
     if (separationMode_.value() == 1.0)
-    {   
+    {
         if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0)
         {
             C0_ = -1.08213;
             C1_ = -0.377233;
             C2_ = 0.062756;
-        }   
+        }
         separationLambda1_ = 1.0;
         separationLambda2_ = 1.0;
     }
 
     if (separationMode_.value() == 2.0)
-    {   
+    {
         if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0)
         {
             C0_ = -1.85884;
@@ -782,7 +782,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     }
 
     if (separationMode_.value() == 3.0)
-    {   
+    {
         if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0 && separationLambda1_.value() == 0.0 && separationLambda2_.value() == 0.0)
         {
             C0_ = -0.252012;
@@ -809,14 +809,14 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
     if (separationMode_.value() == 1.0 || separationMode_.value() == 3.0) // average between PH2800 and CBFS13700
     {
-        alpha1_separation = C0_ 
+        alpha1_separation = C0_
                  + C1_*(i1_- (2.86797085e-02 + 3.22109598e-02) / 2.0) / ((1.96630250e-02 + 1.69618216e-02) / 2.0)
                  + C2_*(i2_ - (-1.21140076e-02 -2.59699426e-02) / 2.0) / ((1.83587958e-02 + 1.65637539e-02) / 2.0);
     }
 
 
     if (separationMode_.value() == 2.0 || separationMode_.value() == 4.0)  // I1I2 for PH2800 + CBFS13700
-    {   
+    {
 
         std::vector<float> Mean_Funcs_SEP ={0.0 , 3.04453342e-02, -1.90419751e-02,  1.26720478e-03, -7.63523411e-04,
                                                 7.16295213e-04,  5.66460407e-05, -3.35790350e-05,  3.07466925e-05,
@@ -859,7 +859,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
                                                  1.72454529e-01,  1.72454529e-01, -2.12910228e-01};
 
         std::vector<float> Theta_SEP(Mean_Funcs_SEP.size(), 0.0);
-        for (int i = 0; i < Theta_SEP.size(); i++) 
+        for (int i = 0; i < Theta_SEP.size(); i++)
         {
             Theta_SEP[0] = Theta_SEP[0] - (C1_.value()*PC1_Coef_SEP[i] + C2_.value()*PC2_Coef_SEP[i])* Mean_Funcs_SEP[i]/Std_Funcs_SEP[i];
             Theta_SEP[i] = (C1_.value()*PC1_Coef_SEP[i] + C2_.value()*PC2_Coef_SEP[i])/Std_Funcs_SEP[i];
@@ -876,7 +876,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
                             + Theta_SEP[15]*pow(i1_,5.0) + Theta_SEP[16]*pow(i1_,4.0)*i2_ + Theta_SEP[17]*pow(i1_,3.0)*pow(i2_,2.0) + Theta_SEP[18]*pow(i1_,2.0)*pow(i2_,3.0) + Theta_SEP[19]*i1_*pow(i2_,4.0) + Theta_SEP[20]*pow(i2_,5.0)
                             + Theta_SEP[21]*pow(i1_,6.0) + Theta_SEP[22]*pow(i1_,5.0)*i2_ + Theta_SEP[23]*pow(i1_,4.0)*pow(i2_,2.0) + Theta_SEP[24]*pow(i1_,3.0)*pow(i2_,3.0) + Theta_SEP[25]*pow(i1_,2.0)*pow(i2_,4.0) + Theta_SEP[26]*i1_*pow(i2_,5.0) + Theta_SEP[27]*pow(i2_,6.0);
 
-        // separationFactor_ = pow(scalar(1)-nut*omega_/k_,SeparationPower_.value())*(alpha1_separation); 
+        // separationFactor_ = pow(scalar(1)-nut*omega_/k_,SeparationPower_.value())*(alpha1_separation);
     }
 
     separationFactor_ = pow(
@@ -888,7 +888,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
                 scalar(1)
             ),
             scalar(0)
-        ),separationLambda2_.value())*(alpha1_separation); 
+        ),separationLambda2_.value())*(alpha1_separation);
 
 
 
@@ -898,7 +898,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
 //  Secondary Flow Calculations
 
-    volScalarField alpha2_secondary = i1_ * 0.0;
+    volScalarField alpha2_secondary(i1_ * 0.0);
 
     if (secondaryMode_.value() == 1.0)
     {
@@ -908,14 +908,14 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
             A1_ = 0.6251856319378204;
             A2_ = 0.9998609367402819;
         }
-        alpha2_secondary = A0_ 
+        alpha2_secondary = A0_
                  + A1_*(i1_- (4.13641572e-02))/9.70441569e-03
                  + A2_*(i2_ - (-4.13023579e-02))/9.75952414e-03;
-        
+
     }
 
     if (secondaryMode_.value() == 2.0)
-    {       
+    {
         if (A0_.value() == 0.0 && A1_.value() == 0.0 && A2_.value() == 0.0)
         {
             A0_ = -1.61278;
@@ -959,7 +959,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
 
         std::vector<float> Theta_(21, 0.0);
-        for (int i = 0; i < Theta_.size(); i++) 
+        for (int i = 0; i < Theta_.size(); i++)
         {
             Theta_[0] = Theta_[0] - (A1_.value()*PC1_Coef[i] + A2_.value()*PC2_Coef[i])* Mean_Funcs[i]/Std_Funcs[i];
             Theta_[i] = (A1_.value()*PC1_Coef[i] + A2_.value()*PC2_Coef[i])/Std_Funcs[i];
@@ -969,20 +969,20 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
 
         alpha2_secondary =    Theta_[0]
-            + Theta_[1]*i1_ + Theta_[2]*i2_ + Theta_[3]*i3_ + Theta_[4]*i4_ + Theta_[5]*i5_ 
+            + Theta_[1]*i1_ + Theta_[2]*i2_ + Theta_[3]*i3_ + Theta_[4]*i4_ + Theta_[5]*i5_
             + Theta_[6]*i1_*i1_ + Theta_[7]*i2_*i2_ + Theta_[8]*i3_*i3_ + Theta_[9]*i4_*i4_ + Theta_[10]*i5_*i5_
-            + Theta_[11]*i1_*i2_ + Theta_[12]*i1_*i3_ + Theta_[13]*i1_*i4_ + Theta_[14]*i1_*i5_ 
+            + Theta_[11]*i1_*i2_ + Theta_[12]*i1_*i3_ + Theta_[13]*i1_*i4_ + Theta_[14]*i1_*i5_
             + Theta_[15]*i2_*i3_ + Theta_[16]*i2_*i4_ + Theta_[17]*i2_*i5_
-            + Theta_[18]*i3_*i4_ + Theta_[19]*i3_*i5_ 
-            + Theta_[20]*i4_*i5_;  
+            + Theta_[18]*i3_*i4_ + Theta_[19]*i3_*i5_
+            + Theta_[20]*i4_*i5_;
     }
 
     bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha2_secondary*T2_) - bijDelta_)*secondary_relaxation_;
 
     Rij_ = ((2.0/3.0)*I)*k_ - 2.0*nut*Sij + 2*k_*bijDelta_;
-    volSymmTensorField dAij = 2*k_*bijDelta_;
+    volSymmTensorField dAij(2*k_*bijDelta_);
     volSymmTensorField P(-twoSymm(dAij & gradU));
-    volScalarField Pk_bijDelta_ = 0.5*tr(P);
+    volScalarField Pk_bijDelta_(0.5*tr(P));
 
 
 
@@ -1012,7 +1012,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     omega_.boundaryFieldRef().updateCoeffs();
 
 
-    
+
 
     volScalarField CDkOmega
     (
