@@ -54,7 +54,7 @@ Mario Javier Rincón <mjrp@mpe.au.dk>
    
 3. Compile the model by the following command: 
 
-         .\Allwmake
+         ./Allwmake
 
 4.1. Add the following line to the _controlDict_ of your case (for incompressible flow):
 
