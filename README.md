@@ -85,8 +85,11 @@ This correction enhances the performance of kOmegaSST turbulence model in captur
 ## Model Configuration
 ### Mode Selection
 By default, the model activates both secondary and separation effects. If desired, one can change the models as follows:
+        ```
          separationMode 4; // default: 4 - off: 0 | ModelI: 1 | ModelII: 2 | ModelIII: 3 | ModelIV: 4
          secondaryMode 2; // default: 2 - off: 0 | ModelI: 1 | ModelII: 2
+        ```
+
 If you use 0, the extra effects are deactivated, and the standard kOmegaSST is used.
 For info about the differences within these models, users are referred to the publications corresponding to the development of the each model (can be found at the end of the document)
    
