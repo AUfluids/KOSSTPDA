@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata"
+title: "KOSSTPDA - Progressive Data-Augmented k-omega SST Model"
+authors:
+  - family-names: Amarloo
+    given-names: Ali
+    email: amarloo@mpe.au.dk
+    affiliation: "Aarhus University"
+  - family-names: Rincón
+    given-names: Mario Javier
+    email: mjrp@mpe.au.dk
+    affiliation: "Aarhus University"
+version: 1.0.0
+date-released: 2023-12-01
+repository-code: "https://github.com/AUfluids/KOSSTPDA"
+license: GPL-3.0
+references:
+  - type: article
+    authors:
+      - family-names: Amarloo
+        given-names: Ali
+      - family-names: Rincón
+        given-names: Mario Javier
+      - family-names: Reclari
+        given-names: Martino
+      - family-names: Abkar
+        given-names: Mahdi
+    title: "Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization"
+    journal: "Physics of Fluids"
+    volume: 35
+    issue: 12
+    year: 2023
+  - type: article
+    authors:
+      - family-names: Rincón
+        given-names: Mario Javier
+      - family-names: Amarloo
+        given-names: Ali
+      - family-names: Reclari
+        given-names: Martino
+      - family-names: Yang
+        given-names: "Xiang I.A."
+      - family-names: Abkar
+        given-names: Mahdi
+    title: "Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation"
+    journal: "International Journal of Heat and Fluid Flow"
+    volume: 104
+    pages: "109242"
+    year: 2023 
