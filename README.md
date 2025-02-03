@@ -39,12 +39,20 @@ Progressive augmentation of the kOmegaSST turbulence model in OpenFOAM. This cor
 
 ## Installation
 1. Clone the repository:
+        ```
          git clone https://github.com/AUfluids/KOSSTPDA.git
+        ```
+
 2. Make the installation script executable:
+        ```
          cd KOSSTPDA
          chmod a+x Allwmake
+        ```
+
 3. Compile the model:
+          ```
          ./Allwmake
+          ```
 
 ## Usage
 1. Add required library to `controlDict`:
