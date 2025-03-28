@@ -81,35 +81,36 @@ The k-omega-SST-PDA model is a progressive data-augmented turbulence model that 
    }
    ```
 
-> **Note**: It is recommended to first run your case with standard kOmegaSST before switching to kOmegaSSTPDA.
+> **Note**: If the solution does not converge at firs, it is recommended to first run your case with standard kOmegaSST before switching to kOmegaSSTPDA.
 
 ## Model Configuration
 ### Mode Selection
 By default, the model activates both secondary and separation effects. If desired, one can change the models as follows:
    ```
-   separationMode 4; // default: 4 - off: 0 | ModelI: 1 | ModelII: 2 | ModelIII: 3 | ModelIV: 4
-   secondaryMode 2; // default: 2 - off: 0 | ModelI: 1 | ModelII: 2
+   separationCorrection true; // default: true - off: false
+   secondaryCorrection true; // default: true - off: false
    ```
 
-If you use 0, the extra effects are deactivated, and the standard kOmegaSST is used.
+If you use false in both corrections, the PDA model is deactivated, and the standard kOmegaSST is used.
 
 ### Optional Stability Settings
 In case of stability and convergence issues, we also suggest the following setting for the new model to be tested.
-Otherwise, these coefficients are automatically assigned with values corresponding to the models.
+Otherwise, these coefficients are automatically assigned with values corresponding to the optimised model.
 
    ```
    // Separation Flow coefficients
-   separationMode 1;
-   separationLambda1 1;
-   separationLambda2 1;
+   separationCorrection true;
    C0 -1;
    C1 0;
    C2 0;
+   lambda1 1;
+   lambda2 1;
    // Secondary Flow coefficients
-   secondaryMode 1;
+   secondaryCorrection true;
    A0 -1;
    A1 0;
    A2 0;
+   secondaryRelaxation 0.6;  // Relaxation factor for more stable simulations
    ```
 
 ## Validation
@@ -121,19 +122,19 @@ The model has been validated across multiple test cases:
 - Converging-diverging channel
 - Parametric bumps
 
-### Secondary Flow Cases
+### Anisotropy-induced Secondary Flow Cases
 - Duct flow (AR = 1, Reb = 3500)
-- Corner flow configurations
-- High-Reynolds-number periodic hills
+- Duct flow (AR = 3, Reb = 2600)
+- Roughness induced atmospheric boundary layer flows
 
 ### Results
 #### Separation
-Results for curved backward-facing step (Reb = 13700, Models I and III):
+Results for curved backward-facing step (Reb = 13700):
 ![Separation Effect Contours](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/contours_comparisonCBFS.png)
 ![Separation Effect Comparison](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/quantitative_comparison_CBFS.png)
 
 #### Anisotropy-induced Secondary Flow
-Results for duct flow (AR = 1, Reb = 3500, Model II):
+Results for duct flow (AR = 1, Reb = 3500):
 ![Secondary Effect U](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_u.png)
 ![Secondary Effect Profiles](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_profiles.png)
 
