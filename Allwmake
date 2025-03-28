@@ -3,7 +3,7 @@ cd "${0%/*}" || exit   # Run from this directory
 . "${WM_PROJECT_DIR:?}"/wmake/scripts/AllwmakeParseArguments
 #------------------------------------------------------------------------------
 
-moduleName="kOmegaSSTPDA_PH"
+moduleName="kOmegaSSTPDA"
 
 if [ "$FOAM_MODULE_PREFIX" = false ]
 then
@@ -44,7 +44,7 @@ else
     echo "${WM_PROJECT_VERSION:-unknown}" >| foamVersionThisIsCompiledFor
 fi
 
-wmake kOmegaSSTPDA_PH
-wmake kOmegaSSTPDA_PH_compressible
+wmake kOmegaSSTPDA
+wmake kOmegaSSTPDA_compressible
 
 #------------------------------------------------------------------------------

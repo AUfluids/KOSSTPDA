@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2013-2016 OpenFOAM Foundation
+    Copyright (C) 2022-2023 OpenCFD Ltd.
     Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
@@ -26,15 +27,35 @@ License
 
 Description
     Implementation of the k-omega-SST-PDA turbulence model for
-    incompressible flows.
+    compressible flows.
 
 \*---------------------------------------------------------------------------*/
 
-#include "turbulentTransportModels.H"
-#include "kOmegaSSTPDA.H"
+#include "turbulentFluidThermoModels.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+defineTurbulenceModelTypes
+(
+    geometricOneField,
+    volScalarField,
+    compressibleTurbulenceModel,
+    CompressibleTurbulenceModel,
+    ThermalDiffusivity,
+    fluidThermo
+);
+
+makeBaseTurbulenceModel
+(
+    geometricOneField,
+    volScalarField,
+    compressibleTurbulenceModel,
+    CompressibleTurbulenceModel,
+    ThermalDiffusivity,
+    fluidThermo
+);
+
+#include "kOmegaSSTPDA.H"
 makeRASModel(kOmegaSSTPDA);
 
 // ************************************************************************* //

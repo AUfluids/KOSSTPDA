@@ -106,11 +106,11 @@ Otherwise, these coefficients are automatically assigned with values correspondi
    lambda1 1;
    lambda2 1;
    // Secondary Flow coefficients
-   secondaryCorrection true;
+   anisotropyCorrection true;
    A0 -1;
    A1 0;
    A2 0;
-   secondaryRelaxation 0.6;  // Relaxation factor for more stable simulations
+   anisotropyRelaxation 0.6;  // Relaxation factor for more stable simulations
    ```
 
 ## Validation

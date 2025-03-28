@@ -7,12 +7,7 @@ ifeq (,$(strip $(FOAM_MODULE_LIBBIN)))
     FOAM_MODULE_LIBBIN = $(FOAM_USER_LIBBIN)
 endif
 
-
-
 include $(GENERAL_RULES)/module-path-user
-
-
-
 
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \

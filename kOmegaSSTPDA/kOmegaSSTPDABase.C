@@ -489,7 +489,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
     ),
 
     // Secondary flow coefficients
-    secondaryCorrection_
+    anisotropyCorrection_
     (
         dimensioned<scalar>::getOrAddToDict
         (
@@ -700,7 +700,7 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
         C2_.readIfPresent(this->coeffDict());
 
         // Secondary flow coefficients
-        secondaryCorrection_.readIfPresent(this->coeffDict());
+        anisotropyCorrection_.readIfPresent(this->coeffDict());
         anisotropyRelaxation_.readIfPresent(this->coeffDict());
         A0_.readIfPresent(this->coeffDict());
         A1_.readIfPresent(this->coeffDict());
@@ -786,7 +786,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
     // Calculate secondary flow factor
     volScalarField alpha_A(I1_ * 0.0);
-    if (secondaryCorrection_.value())
+    if (anisotropyCorrection_.value())
     {
         alpha_A = A0_
                  + A1_*(I1_ - 4.13641572e-02) / 9.70441569e-03
@@ -794,7 +794,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     }
 
     // Update Reynolds stress tensor
-    bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha_A*T2_) - bijDelta_)*anisotropyRelaxation_;
+    bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha_A*Tij2_) - bijDelta_)*anisotropyRelaxation_;
     Rij_ = ((2.0/3.0)*I)*k_ - 2.0*nut*Sij + 2*k_*bijDelta_;
 
     // Calculate production terms
