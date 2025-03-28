@@ -84,11 +84,11 @@ Description
             C2                       -0.215;
 
             // Secondary flow coefficients
-            secondaryCorrection       true;
+            anisotropyCorrection       true;
             A0                       -1.584;
             A1                       -0.685;
             A2                       -0.178;
-            secondary_relaxation      0.5;
+            anisotropyRelaxation      0.5;
 
             // Optional decay control
             decayControl    yes;

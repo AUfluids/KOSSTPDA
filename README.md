@@ -98,18 +98,19 @@ In case of stability and convergence issues, we also suggest the following setti
 Otherwise, these coefficients are automatically assigned with values corresponding to the optimised model.
 
    ```
-   // Separation Flow coefficients
+   // Separation coefficients
    separationCorrection true;
-   C0 -1;
-   C1 0;
-   C2 0;
-   lambda1 1;
-   lambda2 1;
-   // Secondary Flow coefficients
+   C0 -2.070;
+   C1 1.119;
+   C2 -0.215;
+   lambda1 18.622;
+   lambda2 4.698;
+
+   // Anisotropy coefficients
    anisotropyCorrection true;
-   A0 -1;
-   A1 0;
-   A2 0;
+   A0 -1.584;
+   A1 -0.685;
+   A2 -0.178;
    anisotropyRelaxation 0.6;  // Relaxation factor for more stable simulations
    ```
 
