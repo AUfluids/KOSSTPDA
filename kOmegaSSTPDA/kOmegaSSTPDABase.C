@@ -7,6 +7,7 @@
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2015 OpenFOAM Foundation
     Copyright (C) 2016-2020 OpenCFD Ltd.
+    Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -321,6 +322,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         propertiesName
     ),
 
+    // Model coefficients
     alphaK1_
     (
         dimensioned<scalar>::getOrAddToDict
@@ -429,13 +431,15 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
             10.0
         )
     ),
+
+    // Separation correction coefficients
     separationCorrection_
     (
         dimensioned<scalar>::getOrAddToDict
         (
             "separationCorrection",
             this->coeffDict_,
-            3.0
+            true
         )
     ),
     lambda1_
@@ -444,7 +448,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "lambda1",
             this->coeffDict_,
-            0.0
+            18.622
         )
     ),
     lambda2_
@@ -453,7 +457,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "lambda2",
             this->coeffDict_,
-            0.0
+            4.698
         )
     ),
     C0_
@@ -462,7 +466,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "C0",
             this->coeffDict_,
-            0.0
+            -2.070
         )
     ),
     C1_
@@ -471,7 +475,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "C1",
             this->coeffDict_,
-            0.0
+            1.119
         )
     ),
     C2_
@@ -480,18 +484,58 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "C2",
             this->coeffDict_,
-            0.0
+            -0.215
         )
     ),
+
+    // Secondary flow coefficients
     secondaryCorrection_
     (
         dimensioned<scalar>::getOrAddToDict
         (
             "secondaryCorrection",
             this->coeffDict_,
-            2.0
+            true
         )
     ),
+    anisotropyRelaxation_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "secondary_relaxation",
+            this->coeffDict_,
+            0.5
+        )
+    ),
+    A0_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "A0",
+            this->coeffDict_,
+            -1.584
+        )
+    ),
+    A1_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "A1",
+            this->coeffDict_,
+            -0.685
+        )
+    ),
+    A2_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "A2",
+            this->coeffDict_,
+            -0.178
+        )
+    ),
+
+    // Fields
     bijDelta_
     (
         IOobject
@@ -516,42 +560,6 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         ),
         0.0*(((2.0/3.0)*I)*k_ - this->nut_*twoSymm(fvc::grad(this->U_)))
     ),
-    secondary_relaxation_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "secondary_relaxation",
-            this->coeffDict_,
-            0.5
-        )
-    ),
-    A0_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "A0",
-            this->coeffDict_,
-            0.0
-        )
-    ),
-    A1_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "A1",
-            this->coeffDict_,
-            0.0
-        )
-    ),
-    A2_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "A2",
-            this->coeffDict_,
-            0.0
-        )
-    ),
     F3_
     (
         Switch::getOrAddToDict
@@ -561,9 +569,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
             false
         )
     ),
-
     y_(wallDist::New(this->mesh_).y()),
-
     k_
     (
         IOobject
@@ -588,6 +594,20 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         ),
         this->mesh_
     ),
+    separationFactor_
+    (
+        IOobject
+        (
+            IOobject::groupName("separationFactor", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        0*k_/k_
+    ),
+
+    // Decay control
     decayControl_
     (
         Switch::getOrAddToDict
@@ -616,25 +636,12 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
             omega_.dimensions(),
             0
         )
-    ),
-    separationFactor_
-    (
-        IOobject
-        (
-            IOobject::groupName("separationFactor", alphaRhoPhi.group()),
-            this->runTime_.timeName(),
-            this->mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        0*k_/k_
     )
 {
     bound(k_, this->kMin_);
     bound(omega_, this->omegaMin_);
 
     setDecayControl(this->coeffDict_);
-
 }
 
 
@@ -669,6 +676,7 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
 {
     if (BasicEddyViscosityModel::read())
     {
+        // Model coefficients
         alphaK1_.readIfPresent(this->coeffDict());
         alphaK2_.readIfPresent(this->coeffDict());
         alphaOmega1_.readIfPresent(this->coeffDict());
@@ -682,16 +690,23 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
         b1_.readIfPresent(this->coeffDict());
         c1_.readIfPresent(this->coeffDict());
         F3_.readIfPresent("F3", this->coeffDict());
-        secondaryCorrection_.readIfPresent(this->coeffDict());
-        A0_.readIfPresent(this->coeffDict());
-        A1_.readIfPresent(this->coeffDict());
-        A2_.readIfPresent(this->coeffDict());
+
+        // Separation correction coefficients
         separationCorrection_.readIfPresent(this->coeffDict());
+        lambda1_.readIfPresent(this->coeffDict());
+        lambda2_.readIfPresent(this->coeffDict());
         C0_.readIfPresent(this->coeffDict());
         C1_.readIfPresent(this->coeffDict());
         C2_.readIfPresent(this->coeffDict());
-        lambda1_.readIfPresent(this->coeffDict());
-        lambda2_.readIfPresent(this->coeffDict());
+
+        // Secondary flow coefficients
+        secondaryCorrection_.readIfPresent(this->coeffDict());
+        anisotropyRelaxation_.readIfPresent(this->coeffDict());
+        A0_.readIfPresent(this->coeffDict());
+        A1_.readIfPresent(this->coeffDict());
+        A2_.readIfPresent(this->coeffDict());
+
+        // Decay control
         setDecayControl(this->coeffDict());
 
         return true;
@@ -724,50 +739,38 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     tmp<volTensorField> tgradU = fvc::grad(U);
     volScalarField S2(2*magSqr(symm(tgradU())));
 
-    // New calculations
+    // Calculate strain and rotation tensors
     volTensorField gradU(fvc::grad(U));
     volSymmTensorField Sij(symm(gradU));
     volTensorField Oij(-0.5*(gradU - gradU.T()));
     volScalarField S(sqrt(2*magSqr(symm(fvc::grad(U)))));
 
-    volScalarField tScale(1./max( S/a1_ + this->omegaMin_,omega_ + this->omegaMin_));
+    // Calculate time scales
+    volScalarField tScale(1./max(S/a1_ + this->omegaMin_, omega_ + this->omegaMin_));
     volScalarField tScale2(tScale*tScale);
-    //volScalarField tScale3(tScale*tScale2);
-    //volScalarField tScale4(tScale*tScale3);
 
+    // Calculate invariants
     volScalarField I1_(tScale2 * tr(Sij & Sij));
     volScalarField I2_(tScale2 * tr(Oij & Oij));
-    //volScalarField I3_(tScale3 * tr((Sij & Sij) & Sij));
-    //volScalarField I4_(tScale3 * tr((Oij & Oij) & Sij));
-    //volScalarField I5_(tScale4 * tr((Oij & Oij) & (Sij & Sij)));
     volSymmTensorField Tij2_(tScale2 * symm((Sij & Oij) - (Oij & Sij)));
 
+    // Calculate invariants cell by cell
     forAll(Sij, CellI)
     {
         I1_[CellI] = tScale2[CellI] * tr(Sij[CellI] & Sij[CellI]);
         I2_[CellI] = tScale2[CellI] * tr(Oij[CellI] & Oij[CellI]);
-        //I3_[CellI] = tScale3[CellI] * tr((Sij[CellI] & Sij[CellI]) & Sij[CellI]);
-        //I4_[CellI] = tScale3[CellI] * tr((Oij[CellI] & Oij[CellI]) & Sij[CellI]);
-        //I5_[CellI] = tScale4[CellI] * tr((Oij[CellI] & Oij[CellI]) & (Sij[CellI] & Sij[CellI]));
         Tij2_[CellI] = tScale2[CellI] * symm((Sij[CellI] & Oij[CellI]) - (Oij[CellI] & Sij[CellI]));
     }
 
+    dimensionedScalar nutMin("nutMin", dimensionSet(0, 2, -1, 0, 0, 0, 0), 1e-9);
 
-    dimensionedScalar nutMin("nutMin", dimensionSet(0, 2, -1, 0, 0, 0 ,0), 1e-9);
-
+    // Calculate separation factor
     volScalarField alpha_S(I1_ * 0.0);
-
-    // Separation Factor
-    if (separationCorrection.value() == true)
+    if (separationCorrection_.value())
     {
-        C0_ = -2.070;
-        C1_ = 1.119;
-        C2_ = -0.215;
-        lambda1_ = 18.622;
-        lambda2_ = 4.698;
         alpha_S = C0_
-         + C1_*(I1_- 2.86797085e-02) / 1.96630250e-02
-         + C2_*(I2_ - -1.21140076e-02) / 1.83587958e-02;  // z-score standarisation
+                 + C1_*(I1_ - 2.86797085e-02) / 1.96630250e-02
+                 + C2_*(I2_ - -1.21140076e-02) / 1.83587958e-02;  // z-score standardisation
     }
 
     separationFactor_ = pow(
@@ -779,33 +782,31 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
                 scalar(1)
             ),
             scalar(0)
-        ),lambda2_.value())*(alpha_S);
+        ), lambda2_.value())*(alpha_S);
 
-    //  Secondary Flow Factor
+    // Calculate secondary flow factor
     volScalarField alpha_A(I1_ * 0.0);
-
-    if (secondaryCorrection_.value() == 1.0)
+    if (secondaryCorrection_.value())
     {
-        A0_ = -1.584;
-        A1_ = -0.685;
-        A2_ = -0.178;
         alpha_A = A0_
-                 + A1_*(I1_- 4.13641572e-02) / 9.70441569e-03
-                 + A2_*(I2_ - -4.13023579e-02) / 9.75952414e-03;  // z-score standarisation
+                 + A1_*(I1_ - 4.13641572e-02) / 9.70441569e-03
+                 + A2_*(I2_ - -4.13023579e-02) / 9.75952414e-03;  // z-score standardisation
     }
 
-    bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha_A*T2_) - bijDelta_)*secondary_relaxation_;
-
+    // Update Reynolds stress tensor
+    bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha_A*T2_) - bijDelta_)*anisotropyRelaxation_;
     Rij_ = ((2.0/3.0)*I)*k_ - 2.0*nut*Sij + 2*k_*bijDelta_;
+
+    // Calculate production terms
     volSymmTensorField dAij(2*k_*bijDelta_);
     volSymmTensorField P(-twoSymm(dAij & gradU));
     volScalarField Pk_bijDelta_(0.5*tr(P));
 
-    //  Continue with kOmegaSST
+    // Calculate G/nu
     volScalarField::Internal GbyNu0
     (
         this->type() + ":GbyNu",
-        ( (tgradU() && dev(twoSymm(tgradU()))) + Pk_bijDelta_/(nut+ nutMin) )
+        ((tgradU() && dev(twoSymm(tgradU()))) + Pk_bijDelta_/(nut + nutMin))
     );
 
     volScalarField::Internal G(this->GName(), nut*GbyNu0);
@@ -821,19 +822,19 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     volScalarField F1(this->F1(CDkOmega));
     volScalarField F23(this->F23());
 
+    // Solve omega equation
     {
         volScalarField::Internal gamma(this->gamma(F1));
         volScalarField::Internal beta(this->beta(F1));
 
         GbyNu0 = GbyNu(GbyNu0, F23(), S2());
-        // Turbulent frequency equation
         tmp<fvScalarMatrix> omegaEqn
         (
             fvm::ddt(alpha, rho, omega_)
           + fvm::div(alphaRhoPhi, omega_)
           - fvm::laplacian(alpha*rho*DomegaEff(F1), omega_)
          ==
-            alpha()*rho()*gamma*(GbyNu0+GbyNu0*separationFactor_)  // Cw1 F1 omega/k Pk
+            alpha()*rho()*gamma*(GbyNu0 + GbyNu0*separationFactor_)
           - fvm::SuSp((2.0/3.0)*alpha()*rho()*gamma*divU, omega_)
           - fvm::Sp(alpha()*rho()*beta*omega_(), omega_)
           - fvm::SuSp
@@ -855,8 +856,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
         bound(omega_, this->omegaMin_);
     }
 
-
-    // Turbulent kinetic energy equation
+    // Solve k equation
     tmp<fvScalarMatrix> kEqn
     (
         fvm::ddt(alpha, rho, k_)
@@ -870,7 +870,6 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
       + kSource()
       + fvOptions(alpha, rho, k_)
     );
-
 
     tgradU.clear();
 
