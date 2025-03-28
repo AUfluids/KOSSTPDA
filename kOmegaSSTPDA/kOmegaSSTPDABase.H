@@ -155,14 +155,14 @@ protected:
             dimensionedScalar b1_;
             dimensionedScalar c1_;
 
-            dimensionedScalar separationCorrection_;
+            Switch separationCorrection_;
             dimensionedScalar lambda1_;
             dimensionedScalar lambda2_;
             dimensionedScalar C0_;
             dimensionedScalar C1_;
             dimensionedScalar C2_;
 
-            dimensionedScalar anisotropyCorrection_;
+            Switch anisotropyCorrection_;
             dimensionedScalar anisotropyRelaxation_;
             dimensionedScalar A0_;
             dimensionedScalar A1_;
