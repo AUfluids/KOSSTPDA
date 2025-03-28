@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "kOmegaSSTPDA.C": "cpp",
+        "kOmegaSSTPDABase.C": "cpp"
+    }
+}
