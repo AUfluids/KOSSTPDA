@@ -139,6 +139,15 @@ For more details about the separation and secondary flow effects, refer to the p
 ## How to cite
 Please, cite this library using the following two publications: 
 
+Rincón et al. (2025)
+
+    @article{rincon2025generalisable,
+      title={A generalisable data-augmented turbulence model with progressive and interpretable corrections},
+      author={Rinc{\'o}n, Mario J and Reclari, Martino and Yang, Xiang IA and Abkar, Mahdi},
+      journal={arXiv preprint arXiv:2503.18568},
+      year={2025}
+    }
+
 Amarloo and Rincón (2023):
 
     @article{amarloo2023progressive,
