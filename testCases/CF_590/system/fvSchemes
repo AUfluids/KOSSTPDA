@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         steadyState;
+}
+gradSchemes
+{
+    default         Gauss linear;
+    grad(p)         Gauss linear;
+    grad(U)         Gauss linear;
+}
+
+divSchemes
+{
+    default         Gauss linear;
+    div(phi,U)      Gauss linearUpwind grad(U);
+	div(U)			Gauss linear;
+	div(u2)			Gauss linear;
+    div(phi,phit)    Gauss linear;
+    div(phi,f)     Gauss linear;
+    div(phi,k)      Gauss  linear; 
+	div(phi,omega)	Gauss linear;
+    div(phi,epsilon) Gauss linear;
+    div(phi,R)      Gauss linear;
+    div((nuEff*dev2(T(grad(U))))) Gauss linear;
+    div(dAij) Gauss linear;
+    div(((2*k)*dBij)) Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+    interpolate(U)  linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p               ;
+}
+
+wallDist
+{
+    method          meshWave;
+
+    // Optionally correct distance from near-wall cells to the boundary
+    correctWalls    true;
+}
+
+// ************************************************************************* //
