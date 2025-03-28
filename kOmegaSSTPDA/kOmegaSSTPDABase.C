@@ -71,10 +71,10 @@ License
 
 
             // Anisotropy secondary flow coefficients
-            secondaryCorrection       true;              // optional - default: true - off: false
-            A0                  -1.584;             // optional - default taken from secondaryCorrection
-            A1                  -0.685;              // optional - default taken from secondaryCorrection
-            A2                  -0.178;              // optional - default taken from secondaryCorrection
+            anisotropyCorrection       true;              // optional - default: true - off: false
+            A0                  -1.584;             // optional - default taken from anisotropyCorrection
+            A1                  -0.685;              // optional - default taken from anisotropyCorrection
+            A2                  -0.178;              // optional - default taken from anisotropyCorrection
 
 
             // Optional decay control
@@ -435,7 +435,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
     // Separation correction coefficients
     separationCorrection_
     (
-        dimensioned<scalar>::getOrAddToDict
+        Switch::getOrAddToDict
         (
             "separationCorrection",
             this->coeffDict_,
@@ -491,9 +491,9 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
     // Secondary flow coefficients
     anisotropyCorrection_
     (
-        dimensioned<scalar>::getOrAddToDict
+        Switch::getOrAddToDict
         (
-            "secondaryCorrection",
+            "anisotropyCorrection",
             this->coeffDict_,
             true
         )
@@ -692,7 +692,7 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
         F3_.readIfPresent("F3", this->coeffDict());
 
         // Separation correction coefficients
-        separationCorrection_.readIfPresent(this->coeffDict());
+        separationCorrection_.readIfPresent("separationCorrection", this->coeffDict());
         lambda1_.readIfPresent(this->coeffDict());
         lambda2_.readIfPresent(this->coeffDict());
         C0_.readIfPresent(this->coeffDict());
@@ -700,7 +700,7 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
         C2_.readIfPresent(this->coeffDict());
 
         // Secondary flow coefficients
-        anisotropyCorrection_.readIfPresent(this->coeffDict());
+        anisotropyCorrection_.readIfPresent("anisotropyCorrection", this->coeffDict());
         anisotropyRelaxation_.readIfPresent(this->coeffDict());
         A0_.readIfPresent(this->coeffDict());
         A1_.readIfPresent(this->coeffDict());
@@ -766,7 +766,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
     // Calculate separation factor
     volScalarField alpha_S(I1_ * 0.0);
-    if (separationCorrection_.value())
+    if (separationCorrection_)
     {
         alpha_S = C0_
                  + C1_*(I1_ - 2.86797085e-02) / 1.96630250e-02
@@ -786,7 +786,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
 
     // Calculate secondary flow factor
     volScalarField alpha_A(I1_ * 0.0);
-    if (anisotropyCorrection_.value())
+    if (anisotropyCorrection_)
     {
         alpha_A = A0_
                  + A1_*(I1_ - 4.13641572e-02) / 9.70441569e-03
