@@ -24,7 +24,7 @@ The k-omega-SST-PDA model is a progressive data-augmented turbulence model that 
   - Activation-based separation correction in the omega-equation
   - Optimised power-law function for local turbulent viscosity adjustment
   - Improved predictions in adverse pressure gradient regions
-- **Secondary Flow Prediction**:
+- **Anisotropy-induced Secondary Flow Prediction**:
   - Non-linear Reynolds stress anisotropy correction
   - Enhanced prediction of Prandtl's second kind of secondary flows
   - Improved corner flow and streamwise vorticity predictions
@@ -143,6 +143,7 @@ The code is known to work with OpenFOAM-v2412 and previous ESI versions.
 
 ## Authors
 Mario Javier Rincón <mjrp@mpe.au.dk>
+
 Ali Amarloo <amarloo@mpe.au.dk>
 
 ## References
