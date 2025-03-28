@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "kOmegaSSTPDA.C": "cpp",
-        "kOmegaSSTPDABase.C": "cpp",
-        "myTurbulentFluidThermoModels.C": "cpp",
-        "myTurbulentTransportModels.C": "cpp"
-    }
-    
-}
