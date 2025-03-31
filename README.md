@@ -128,15 +128,20 @@ The model has been validated across multiple test cases:
 - Roughness induced atmospheric boundary layer flows
 
 ### Results
+#### Law-of-the-wall
+Results for channel flow (Re_tau = 590):
+![Law-of-the-wall](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CF_590/CF_u_CF_590.png)
+
 #### Separation
-Results for curved backward-facing step (Reb = 13700):
-![Separation Effect Contours](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/contours_comparisonCBFS.png)
-![Separation Effect Comparison](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/quantitative_comparison_CBFS.png)
+Results for periodic hill (Reb = 2800):
+![Velocity Contours](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/PH_2800/contours_comparison_PH_2800.png)
+![Velocity Profiles Comparison](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/PH_2800/profiles_comparison_PH_2800.png)
 
 #### Anisotropy-induced Secondary Flow
 Results for duct flow (AR = 1, Reb = 3500):
-![Secondary Effect U](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_u.png)
-![Secondary Effect Profiles](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_profiles.png)
+![Anisotropy Secondary Flow](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/SD_ReB3500_AR1/contours_comparison_SD_ReB3500_AR1.png)
+![Velocity Profiles](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/SD_ReB3500_AR1/profiles_comparison_SD_ReB3500_AR1.png)
+![Reynolds Stress Profiles](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/SD_ReB3500_AR1/profiles_comparison_Rij_SD_ReB3500_AR1.png)
 
 ## Target platform
 The code is known to work with OpenFOAM-v2412 and previous ESI versions.
