@@ -107,15 +107,15 @@ You can also check the test cases of CBFS_Reb13700 and ductFlowAR1Reb3500 in the
 ## Test results of the separation effect
 
 Results of using KOSSTPDA for curved backward-facing step with bulk Reynolds number of 13700 **I** and **III**:
-![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/contours_comparisonCBFS.png)
-![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/quantitative_comparison_CBFS.png)
+![alt text](https://github.com/AUfluids/KOSSTPDA/blob/v1.0/testCases/CBFS_Reb13700/contours_comparisonCBFS.png)
+![alt text](https://github.com/AUfluids/KOSSTPDA/blob/v1.0/testCases/CBFS_Reb13700/quantitative_comparison_CBFS.png)
 
 
 ## Test results of the secondary effect
 
 Results for a duct flow of aspect ratio 1 at bulk Reynolds number 3500 for Model **II**:
-![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_u.png)
-![alt text](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_profiles.png)
+![alt text](https://github.com/AUfluids/KOSSTPDA/blob/v1.0/testCases/ductFlowAR1Reb3500/SD_u.png)
+![alt text](https://github.com/AUfluids/KOSSTPDA/blob/v1.0/testCases/ductFlowAR1Reb3500/SD_profiles.png)
 
 
 ## References
