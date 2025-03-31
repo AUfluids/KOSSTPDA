@@ -1,0 +1,35 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  8  
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+type            surfaces;
+
+libs            ("libsampling.so");
+
+writeControl    writeTime;
+interpolationScheme cellPoint;
+surfaceFormat       raw;
+
+
+
+surfaces
+(
+    RANS
+    {
+        type cuttingPlane;
+        planeType pointAndNormal;
+        pointAndNormalDict
+        {
+        basePoint (0 0 0);
+        normalVector (0.1 0 0);
+        }   
+        // triangulate false;
+    }
+    
+);
+
+fields          (U turbulenceProperties:R dBij R_corr Aij Bij k epsilon nut);
+// ************************************************************************* //

@@ -10,11 +10,25 @@ authors:
     given-names: Ali
     email: amarloo@mpe.au.dk
     affiliation: "Aarhus University"
-version: 1.0.0
-date-released: 2023-12-01
+version: 2.0.0
+date-released: 2024-03-24
 repository-code: "https://github.com/AUfluids/KOSSTPDA"
 license: GPL-3.0
 references:
+  - type: article
+    authors:
+      - family-names: Rincón
+        given-names: Mario Javier
+      - family-names: Reclari
+        given-names: Martino
+      - family-names: Yang
+        given-names: "Xiang I.A."
+      - family-names: Abkar
+        given-names: Mahdi
+    title: "A generalisable data-augmented turbulence model with progressive and interpretable corrections"
+    journal: "arXiv preprint"
+    volume: "arXiv:2503.18568"
+    year: 2025
   - type: article
     authors:
       - family-names: Amarloo

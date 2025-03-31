@@ -1,6 +1,5 @@
 # KOSSTPDA
-Progressive data-augmented k-omega SST model as proposed by Amarloo and Rincón (2023) for OpenFOAM.
-Developed by Fluid Physics & Turbulence research group at Aarhus University.
+A generalisable data-augmented k-omega SST model with progressive and interpretable corrections for OpenFOAM. Developed by Fluid Physics & Turbulence research group at Aarhus University.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -9,7 +8,7 @@ Developed by Fluid Physics & Turbulence research group at Aarhus University.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Model Configuration](#model-configuration)
-- [Test Results](#test-results)
+- [Validation](#validation)
 - [License](#license)
 - [Citations](#how-to-cite)
 - [Authors](#authors)
@@ -17,27 +16,29 @@ Developed by Fluid Physics & Turbulence research group at Aarhus University.
 - [Disclaimer](#disclaimer)
 
 ## Overview
-Progressive augmentation of the kOmegaSST turbulence model in OpenFOAM. Standard optimised values are given by default in the model.
-More information is available in the publications listed at the end of this file.
-This correction enhances the performance of kOmegaSST turbulence model in capturing:
+The k-omega-SST-PDA model is a progressive data-augmented turbulence model that combines Bayesian optimisation with physics-guided corrections to improve predictions of anisotropy-induced secondary flows and flow separation simultaneously. The model features:
 
-### Features
-- **Separation Flow**: Optimised for separation after bumps or cases with high adverse pressure gradient, including:
-  - Periodic hills
-  - Curved backward-facing step
-  - Converging-diverging channel
-  - Parametric bumps
-
-- **Secondary Flow**: Specifically the Prandtl's second kind of secondary flow (corner flow) induced by heterogenities of the Reynolds stresses.
+### Key Features
+- **Progressive Data Augmentation (PDA)**: A framework that systematically embeds interpretable modifications through Bayesian optimisation
+- **Separation Flow Enhancement**: 
+  - Activation-based separation correction in the omega-equation
+  - Optimised power-law function for local turbulent viscosity adjustment
+  - Improved predictions in adverse pressure gradient regions
+- **Anisotropy-induced Secondary Flow Prediction**:
+  - Non-linear Reynolds stress anisotropy correction
+  - Enhanced prediction of Prandtl's second kind of secondary flows
+  - Improved corner flow and streamwise vorticity predictions
 
 ### Implementation Details
-- Optimised for 2D cases
-- Tested and validated on 3D flows
-- Configurable through five user-modifiable coefficients
+- Optimised for 2D flows
+- Verified in 3D flows
+- Configurable through user-modifiable coefficients
 - Default optimised values provided
+- Compatible with incompressible and compressible flows
 
 ## Requirements
-- Compatible with OpenFOAM-v2412 and previous ESI versions
+- OpenFOAM-v2412 or previous ESI versions
+- C++11 or later
 
 ## Installation
 1. Clone the repository:
@@ -80,46 +81,60 @@ This correction enhances the performance of kOmegaSST turbulence model in captur
    }
    ```
 
-> **Note**: It is recommended to first run your case with standard kOmegaSST before switching to kOmegaSSTPDA.
+> **Note**: If the solution does not converge at firs, it is recommended to first run your case with standard kOmegaSST before switching to kOmegaSSTPDA.
 
 ## Model Configuration
 ### Mode Selection
 By default, the model activates both secondary and separation effects. If desired, one can change the models as follows:
    ```
-   separationMode 4; // default: 4 - off: 0 | ModelI: 1 | ModelII: 2 | ModelIII: 3 | ModelIV: 4
-   secondaryMode 2; // default: 2 - off: 0 | ModelI: 1 | ModelII: 2
+   separationCorrection true; // default: true - off: false
+   secondaryCorrection true; // default: true - off: false
    ```
 
-If you use 0, the extra effects are deactivated, and the standard kOmegaSST is used.
-For info about the differences within these models, users are referred to the publications corresponding to the development of the each model (can be found at the end of the document)
-   
+If you use false in both corrections, the PDA model is deactivated, and the standard kOmegaSST is used.
+
 ### Optional Stability Settings
 In case of stability and convergence issues, we also suggest the following setting for the new model to be tested.
-Otherwise, these coefficients are automatically assigned with values corresponding to the models.
+Otherwise, these coefficients are automatically assigned with values corresponding to the optimised model.
 
    ```
    // Separation Flow coefficients
-   separationMode 1;
-   separationLambda1 1;
-   separationLambda2 1;
+   separationCorrection true;
    C0 -1;
    C1 0;
    C2 0;
+   lambda1 1;
+   lambda2 1;
    // Secondary Flow coefficients
-   secondaryMode 1;
+   secondaryCorrection true;
    A0 -1;
    A1 0;
    A2 0;
+   secondaryRelaxation 0.6;  // Relaxation factor for more stable simulations
    ```
 
-## Test Results
-### Separation Effect
-Results for curved backward-facing step (Reb = 13700, Models I and III):
+## Validation
+The model has been validated across multiple test cases:
+
+### Separation Flow Cases
+- Periodic hills
+- Curved backward-facing step (Reb = 13700)
+- Converging-diverging channel
+- Parametric bumps
+
+### Anisotropy-induced Secondary Flow Cases
+- Duct flow (AR = 1, Reb = 3500)
+- Duct flow (AR = 3, Reb = 2600)
+- Roughness induced atmospheric boundary layer flows
+
+### Results
+#### Separation
+Results for curved backward-facing step (Reb = 13700):
 ![Separation Effect Contours](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/contours_comparisonCBFS.png)
 ![Separation Effect Comparison](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/CBFS_Reb13700/quantitative_comparison_CBFS.png)
 
-### Secondary Effect
-Results for duct flow (AR = 1, Reb = 3500, Model II):
+#### Anisotropy-induced Secondary Flow
+Results for duct flow (AR = 1, Reb = 3500):
 ![Secondary Effect U](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_u.png)
 ![Secondary Effect Profiles](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/ductFlowAR1Reb3500/SD_profiles.png)
 
@@ -128,59 +143,61 @@ The code is known to work with OpenFOAM-v2412 and previous ESI versions.
 
 ## Authors
 Mario Javier Rincón <mjrp@mpe.au.dk>
+
 Ali Amarloo <amarloo@mpe.au.dk>
 
 ## References
-For more details about the separation and secondary flow effects, refer to the publications at: 
- - [Progressive augmentation of turbulence models for **flow separation** by multi-case computational fluid dynamics driven surrogate optimization](https://doi.org/10.1063/5.0174470)
- - [Progressive augmentation of Reynolds stress tensor models for **secondary flow** prediction by computational fluid dynamics driven surrogate optimisation](https://doi.org/10.1016/j.ijheatfluidflow.2023.109242)
-
+For more details about the model development and validation, refer to:
+- [A generalisable data-augmented turbulence model with progressive and interpretable corrections](https://arxiv.org/abs/2503.18568)
+- [Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization](https://doi.org/10.1063/5.0174470)
+- [Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation](https://doi.org/10.1016/j.ijheatfluidflow.2023.109242)
 
 ## How to cite
-Please, cite this library using the following two publications: 
+Please cite this library using the following publications:
 
 Rincón et al. (2025)
+```
+@article{rincon2025generalisable,
+  title={A generalisable data-augmented turbulence model with progressive and interpretable corrections},
+  author={Rinc{\'o}n, Mario J and Reclari, Martino and Yang, Xiang IA and Abkar, Mahdi},
+  journal={arXiv preprint arXiv:2503.18568},
+  year={2025}
+}
+```
 
-    @article{rincon2025generalisable,
-      title={A generalisable data-augmented turbulence model with progressive and interpretable corrections},
-      author={Rinc{\'o}n, Mario J and Reclari, Martino and Yang, Xiang IA and Abkar, Mahdi},
-      journal={arXiv preprint arXiv:2503.18568},
-      year={2025}
-    }
-
-Amarloo and Rincón (2023):
-
-    @article{amarloo2023progressive,
-      title={Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization},
-      author={Amarloo, Ali and Rinc{\'o}n, Mario Javier and Reclari, Martino and Abkar, Mahdi},
-      journal={Physics of Fluids},
-      volume={35},
-      number={12},
-      year={2023},
-      publisher={AIP Publishing}
-    }
+Amarloo and Rincón (2023)
+```
+@article{amarloo2023progressive,
+  title={Progressive augmentation of turbulence models for flow separation by multi-case computational fluid dynamics driven surrogate optimization},
+  author={Amarloo, Ali and Rinc{\'o}n, Mario Javier and Reclari, Martino and Abkar, Mahdi},
+  journal={Physics of Fluids},
+  volume={35},
+  number={12},
+  year={2023},
+  publisher={AIP Publishing}
+}
+```
 
 Rincón and Amarloo (2023)
-
-         @article{rincon2023progressive,
-         title = {Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation},
-         journal = {International Journal of Heat and Fluid Flow},
-         volume = {104},
-         pages = {109242},
-         year = {2023},
-         issn = {0142-727X},
-         doi = {https://doi.org/10.1016/j.ijheatfluidflow.2023.109242},
-         author = {Mario Javier Rincón and Ali Amarloo and Martino Reclari and Xiang I.A. Yang and Mahdi Abkar},
-         }
-
+```
+@article{rincon2023progressive,
+  title={Progressive augmentation of Reynolds stress tensor models for secondary flow prediction by computational fluid dynamics driven surrogate optimisation},
+  journal={International Journal of Heat and Fluid Flow},
+  volume={104},
+  pages={109242},
+  year={2023},
+  issn={0142-727X},
+  doi={https://doi.org/10.1016/j.ijheatfluidflow.2023.109242},
+  author={Mario Javier Rincón and Ali Amarloo and Martino Reclari and Xiang I.A. Yang and Mahdi Abkar}
+}
+```
 
 ## Disclaimer
 This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM® and OpenCFD® trade marks.
 
-Detailed information on the OpenFOAM trademark can be found at
+Detailed information on the OpenFOAM trademark can be found at:
+- http://www.openfoam.com/legal/trademark-policy.php
+- http://www.openfoam.com/legal/trademark-guidelines.php
 
-http://www.openfoam.com/legal/trademark-policy.php
-http://www.openfoam.com/legal/trademark-guidelines.php
-For further information on OpenCFD and OpenFOAM, please refer to
-
-http://www.openfoam.com
+For further information on OpenCFD and OpenFOAM, please refer to:
+- http://www.openfoam.com
