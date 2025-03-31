@@ -6,8 +6,6 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
-    Copyright (C) 2019 OpenCFD Ltd.
-    Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -28,8 +26,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "kOmegaSSTPDA.H"
-#include "fvOptions.H"
-#include "bound.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,7 +34,28 @@ namespace Foam
 namespace RASModels
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+template<class BasicTurbulenceModel>
+void kOmegaSSTPDA<BasicTurbulenceModel>::correctNut(const volScalarField& S2)
+{
+    // Correct the turbulence viscosity
+    kOmegaSSTPDABase<eddyViscosity<RASModel<BasicTurbulenceModel>>>::correctNut
+    (
+        S2
+    );
+
+    // Correct the turbulence thermal diffusivity
+    BasicTurbulenceModel::correctNut();
+}
+
+
+template<class BasicTurbulenceModel>
+void kOmegaSSTPDA<BasicTurbulenceModel>::correctNut()
+{
+    correctNut(2*magSqr(symm(fvc::grad(this->U_))));
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -71,24 +88,6 @@ kOmegaSSTPDA<BasicTurbulenceModel>::kOmegaSSTPDA
     {
         this->printCoeffs(type);
     }
-}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class BasicTurbulenceModel>
-void kOmegaSSTPDA<BasicTurbulenceModel>::correctNut(const volScalarField& S2)
-{
-    this->nut_ = this->a1_*this->k_/max(this->a1_*this->omega_, this->b1_*this->F23()*sqrt(S2));
-    this->nut_.correctBoundaryConditions();
-    fv::options::New(this->mesh_).correct(this->nut_);
-}
-
-
-template<class BasicTurbulenceModel>
-void kOmegaSSTPDA<BasicTurbulenceModel>::correctNut()
-{
-    correctNut(2*magSqr(symm(fvc::grad(this->U_))));
 }
 
 

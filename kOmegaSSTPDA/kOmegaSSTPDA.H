@@ -7,7 +7,6 @@
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
     Copyright (C) 2019 OpenCFD Ltd.
-    Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -26,37 +25,16 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::RASModels::kOmegaSSTPDA
+    Foam::RASModels::kOmegaSST
 
 Group
     grpRASTurbulence
 
 Description
-    Implementation of the k-omega-SST-PDA turbulence model for
+    Implementation of the k-omega-SST turbulence model for
     incompressible and compressible flows.
 
-    The model includes:
-    - Separation factor correction
-    - Secondary flow prediction
-    - Progressive data augmentation (PDA)
-
-    References:
-    \verbatim
-        Rincon, M. J., Reclari, M., Yang, X. I. A., & Abkar, M. (2025).
-        A generalisable data-augmented turbulence model with progressive 
-        and interpretable corrections.
-        arXiv preprint arXiv:2503.18568.
-
-        Amarloo, A., Rincon, M. J., Reclari, M., & Abkar, M. (2023).
-        Progressive augmentation of RANS models for separated flow prediction
-        by CFD-driven surrogate multi-objective optimisation.
-
-        Rincon, M. J., Amarloo, A., Reclari, M., Yang, X. I. A., & Abkar, M. (2023).
-        Progressive augmentation of Reynolds stress tensor models for secondary flow prediction
-        by computational fluid dynamics driven surrogate optimisation.
-    \endverbatim
-
-    Light wrapper around base class, see kOmegaSSTPDABase.
+    Light wrapper around base class,  See kOmegaSSTPDABase.
 
 SourceFiles
     kOmegaSSTPDA.C

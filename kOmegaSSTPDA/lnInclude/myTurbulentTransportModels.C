@@ -6,7 +6,6 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2013-2016 OpenFOAM Foundation
-    Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,17 +23,14 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    Implementation of the k-omega-SST-PDA turbulence model for
-    incompressible flows.
-
 \*---------------------------------------------------------------------------*/
 
 #include "turbulentTransportModels.H"
+
+
+
 #include "kOmegaSSTPDA.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 makeRASModel(kOmegaSSTPDA);
+
 
 // ************************************************************************* //

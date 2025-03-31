@@ -7,7 +7,6 @@
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2015 OpenFOAM Foundation
     Copyright (C) 2016-2020 OpenCFD Ltd.
-    Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -29,14 +28,10 @@ License
     Progressive data augmented (PDA) 2023, A. Amarloo, M. Rincon
 
     More details and test cases in following publications:
-    M. J. Rincon, M. Reclari, X. I. A. Yang, and M. Abkar,
-    "A generalisable data-augmented turbulence model with progressive and interpretable corrections." (2025).
-    arXiv preprint arXiv:2503.18568.
-
     A. Amarloo, M. J. Rincon, M. Reclari, and M. Abkar,
     "Progressive augmentation of RANS models for separated flow prediction
     by CFD-driven surrogate multi-objective optimisation." (2023).
-    
+    and
     M. J. Rincon, A. Amarloo,  M. Reclari, X.I.A. Yang, and M. Abkar,
     "Progressive augmentation of Reynolds stress tensor models for secondary flow prediction
     by computational fluid dynamics driven surrogate optimisation" (2023).
@@ -61,20 +56,20 @@ License
             F3              no;
 
 
-            // Separation coefficients
-            separationCorrection      true;              // optional - default: true - off: false
-            lambda1   1;              // optional - default taken from separationCorrection
-            lambda2   1;              // optional - default taken from separationCorrection
-            C0                  -2.070;             // optional - default taken from separationCorrection
-            C1                  1.119;              // optional - default taken from separationCorrection
-            C2                  -0.215;              // optional - default taken from separationCorrection
+            //Separation coefficients
+            separationMode      4;              //optional - default:4 - off:0 | ModelI:1 | ModelII:2 | ModelIII:3 | ModelIV:4
+            separationLambda1   1;              //optional - default taken from separationMode 4
+            separationLambda2   1;              //optional - default taken from separationMode 4
+            C0                  -1;             //optional - default taken from separationMode 4
+            C1                  0;              //optional - default taken from separationMode 4
+            C2                  0;              //optional - default taken from separationMode 4
 
 
-            // Anisotropy secondary flow coefficients
-            anisotropyCorrection       true;              // optional - default: true - off: false
-            A0                  -1.584;             // optional - default taken from anisotropyCorrection
-            A1                  -0.685;              // optional - default taken from anisotropyCorrection
-            A2                  -0.178;              // optional - default taken from anisotropyCorrection
+            //Secodnary Flow coefficients
+            secondaryMode       2;              //optional - default:2 - off:0 | ModelI:1 | ModelII:2
+            A0                  -1;             //optional - default taken from secondaryMode 2
+            A1                  0;              //optional - default taken from secondaryMode 2
+            A2                  0;              //optional - default taken from secondaryMode 2
 
 
             // Optional decay control
@@ -322,7 +317,167 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         propertiesName
     ),
 
-    // Model coefficients
+    // Added by Mario
+
+    I1_
+    (
+        IOobject
+        (
+            IOobject::groupName("I1", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,                     // Use 'this->mesh_' to initialize the field
+        dimensionedScalar("zero", dimless, 0)
+    ),
+    I2_
+    (
+        IOobject
+        (
+            IOobject::groupName("I2", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedScalar("zero", dimless, 0)
+    ),
+    I3_
+    (
+        IOobject
+        (
+            IOobject::groupName("I3", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedScalar("zero", dimless, 0)
+    ),
+    I4_
+    (
+        IOobject
+        (
+            IOobject::groupName("I4", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedScalar("zero", dimless, 0)
+    ),
+    I5_
+    (
+        IOobject
+        (
+            IOobject::groupName("I5", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedScalar("zero", dimless, 0)
+    ),
+    Sij_
+    (
+        IOobject
+        (
+            IOobject::groupName("Sij", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    ),
+    Omegaij_
+    (
+        IOobject
+        (
+            IOobject::groupName("Omegaij", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedTensor("zero", dimless, tensor::zero)
+    ),
+    Tij1_
+    (
+        IOobject
+        (
+            IOobject::groupName("Tij1", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    ),
+    Tij2_
+    (
+        IOobject
+        (
+            IOobject::groupName("Tij2", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    ),
+    Tij3_
+    (
+        IOobject
+        (
+            IOobject::groupName("Tij3", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    ),
+    Tij4_
+    (
+        IOobject
+        (
+            IOobject::groupName("Tij4", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    ),
+    Tij5_
+    (
+        IOobject
+        (
+            IOobject::groupName("Tij5", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        this->mesh_,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    ),
+
+    // Normal model
+
     alphaK1_
     (
         dimensioned<scalar>::getOrAddToDict
@@ -431,33 +586,31 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
             10.0
         )
     ),
-
-    // Separation correction coefficients
-    separationCorrection_
-    (
-        Switch::getOrAddToDict
-        (
-            "separationCorrection",
-            this->coeffDict_,
-            true
-        )
-    ),
-    lambda1_
+    separationMode_
     (
         dimensioned<scalar>::getOrAddToDict
         (
-            "lambda1",
+            "separationMode",
             this->coeffDict_,
-            18.622
+            3.0
         )
     ),
-    lambda2_
+    separationLambda1_
     (
         dimensioned<scalar>::getOrAddToDict
         (
-            "lambda2",
+            "separationLambda1",
             this->coeffDict_,
-            4.698
+            0.0
+        )
+    ),
+    separationLambda2_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "separationLambda2",
+            this->coeffDict_,
+            0.0
         )
     ),
     C0_
@@ -466,7 +619,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "C0",
             this->coeffDict_,
-            -2.070
+            0.0
         )
     ),
     C1_
@@ -475,7 +628,7 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "C1",
             this->coeffDict_,
-            1.119
+            0.0
         )
     ),
     C2_
@@ -484,58 +637,18 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         (
             "C2",
             this->coeffDict_,
-            -0.215
+            0.0
         )
     ),
-
-    // Secondary flow coefficients
-    anisotropyCorrection_
-    (
-        Switch::getOrAddToDict
-        (
-            "anisotropyCorrection",
-            this->coeffDict_,
-            true
-        )
-    ),
-    anisotropyRelaxation_
+    secondaryMode_
     (
         dimensioned<scalar>::getOrAddToDict
         (
-            "secondary_relaxation",
+            "secondaryMode",
             this->coeffDict_,
-            0.5
+            2.0
         )
     ),
-    A0_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "A0",
-            this->coeffDict_,
-            -1.584
-        )
-    ),
-    A1_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "A1",
-            this->coeffDict_,
-            -0.685
-        )
-    ),
-    A2_
-    (
-        dimensioned<scalar>::getOrAddToDict
-        (
-            "A2",
-            this->coeffDict_,
-            -0.178
-        )
-    ),
-
-    // Fields
     bijDelta_
     (
         IOobject
@@ -560,6 +673,42 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         ),
         0.0*(((2.0/3.0)*I)*k_ - this->nut_*twoSymm(fvc::grad(this->U_)))
     ),
+    secondary_relaxation_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "secondary_relaxation",
+            this->coeffDict_,
+            0.5
+        )
+    ),
+    A0_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "A0",
+            this->coeffDict_,
+            0.0
+        )
+    ),
+    A1_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "A1",
+            this->coeffDict_,
+            0.0
+        )
+    ),
+    A2_
+    (
+        dimensioned<scalar>::getOrAddToDict
+        (
+            "A2",
+            this->coeffDict_,
+            0.0
+        )
+    ),
     F3_
     (
         Switch::getOrAddToDict
@@ -569,7 +718,9 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
             false
         )
     ),
+
     y_(wallDist::New(this->mesh_).y()),
+
     k_
     (
         IOobject
@@ -594,20 +745,6 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
         ),
         this->mesh_
     ),
-    separationFactor_
-    (
-        IOobject
-        (
-            IOobject::groupName("separationFactor", alphaRhoPhi.group()),
-            this->runTime_.timeName(),
-            this->mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        0*k_/k_
-    ),
-
-    // Decay control
     decayControl_
     (
         Switch::getOrAddToDict
@@ -636,12 +773,25 @@ kOmegaSSTPDABase<BasicEddyViscosityModel>::kOmegaSSTPDABase
             omega_.dimensions(),
             0
         )
+    ),
+    separationFactor_
+    (
+        IOobject
+        (
+            IOobject::groupName("separationFactor", alphaRhoPhi.group()),
+            this->runTime_.timeName(),
+            this->mesh_,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        0*k_/k_
     )
 {
     bound(k_, this->kMin_);
     bound(omega_, this->omegaMin_);
 
     setDecayControl(this->coeffDict_);
+
 }
 
 
@@ -676,7 +826,6 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
 {
     if (BasicEddyViscosityModel::read())
     {
-        // Model coefficients
         alphaK1_.readIfPresent(this->coeffDict());
         alphaK2_.readIfPresent(this->coeffDict());
         alphaOmega1_.readIfPresent(this->coeffDict());
@@ -690,23 +839,16 @@ bool kOmegaSSTPDABase<BasicEddyViscosityModel>::read()
         b1_.readIfPresent(this->coeffDict());
         c1_.readIfPresent(this->coeffDict());
         F3_.readIfPresent("F3", this->coeffDict());
-
-        // Separation correction coefficients
-        separationCorrection_.readIfPresent("separationCorrection", this->coeffDict());
-        lambda1_.readIfPresent(this->coeffDict());
-        lambda2_.readIfPresent(this->coeffDict());
+        separationMode_.readIfPresent(this->coeffDict());
+        separationLambda1_.readIfPresent(this->coeffDict());
+        separationLambda2_.readIfPresent(this->coeffDict());
         C0_.readIfPresent(this->coeffDict());
         C1_.readIfPresent(this->coeffDict());
         C2_.readIfPresent(this->coeffDict());
-
-        // Secondary flow coefficients
-        anisotropyCorrection_.readIfPresent("anisotropyCorrection", this->coeffDict());
-        anisotropyRelaxation_.readIfPresent(this->coeffDict());
+        secondaryMode_.readIfPresent(this->coeffDict());
         A0_.readIfPresent(this->coeffDict());
         A1_.readIfPresent(this->coeffDict());
         A2_.readIfPresent(this->coeffDict());
-
-        // Decay control
         setDecayControl(this->coeffDict());
 
         return true;
@@ -739,80 +881,320 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     tmp<volTensorField> tgradU = fvc::grad(U);
     volScalarField S2(2*magSqr(symm(tgradU())));
 
-    // Calculate strain and rotation tensors
+
+    // New calculations by Mario
+
+    // Write the fields to the results directory
+    // I1_.write();
+    // Tij1_.write();
+    // Sij_.write();
+    // Omegaij_.write();
+
+    // New calculations
+
     volTensorField gradU(fvc::grad(U));
     volSymmTensorField Sij(symm(gradU));
-    volTensorField Oij(-0.5*(gradU - gradU.T()));
+    volTensorField Omegaij(-0.5*(gradU - gradU.T()));
     volScalarField S(sqrt(2*magSqr(symm(fvc::grad(U)))));
 
-    // Calculate time scales
-    volScalarField tScale(1./max(S/a1_ + this->omegaMin_, omega_ + this->omegaMin_));
+    volScalarField tScale(1./max( S/a1_ + this->omegaMin_,omega_ + this->omegaMin_));
     volScalarField tScale2(tScale*tScale);
+    volScalarField tScale3(tScale*tScale2);
+    volScalarField tScale4(tScale*tScale3);
+    volScalarField tScale5(tScale*tScale4);
 
-    // Calculate invariants
     volScalarField I1_(tScale2 * tr(Sij & Sij));
-    volScalarField I2_(tScale2 * tr(Oij & Oij));
-    volSymmTensorField Tij2_(tScale2 * symm((Sij & Oij) - (Oij & Sij)));
+    volScalarField I2_(tScale2 * tr(Omegaij & Omegaij));
+    volScalarField I3_(tScale3 * tr((Sij & Sij) & Sij));
+    volScalarField I4_(tScale3 * tr((Omegaij & Omegaij) & Sij));
+    volScalarField I5_(tScale4 * tr((Omegaij & Omegaij) & (Sij & Sij)));
 
-    // Calculate invariants cell by cell
+    volSymmTensorField Tij1_(tScale * Sij);
+    volSymmTensorField Tij2_(tScale2 * symm((Sij & Omegaij) - (Omegaij & Sij)));
+    volSymmTensorField Tij3_(tScale3 * symm((Sij & Sij) & Omegaij - Omegaij & (Sij & Sij)));
+    volSymmTensorField Tij4_(tScale4 * symm((Omegaij & Omegaij) & Sij - Sij & (Omegaij & Omegaij)));
+    volSymmTensorField Tij5_(tScale5 * symm((Omegaij & Omegaij) & (Sij & Sij) - (Sij & Sij) & (Omegaij & Omegaij)));
+
     forAll(Sij, CellI)
     {
+        // Compute invariants
         I1_[CellI] = tScale2[CellI] * tr(Sij[CellI] & Sij[CellI]);
-        I2_[CellI] = tScale2[CellI] * tr(Oij[CellI] & Oij[CellI]);
-        Tij2_[CellI] = tScale2[CellI] * symm((Sij[CellI] & Oij[CellI]) - (Oij[CellI] & Sij[CellI]));
+        I2_[CellI] = tScale2[CellI] * tr(Omegaij[CellI] & Omegaij[CellI]);
+        I3_[CellI] = tScale3[CellI] * tr((Sij[CellI] & Sij[CellI]) & Sij[CellI]);
+        I4_[CellI] = tScale3[CellI] * tr((Omegaij[CellI] & Omegaij[CellI]) & Sij[CellI]);
+        I5_[CellI] = tScale4[CellI] * tr((Omegaij[CellI] & Omegaij[CellI]) & (Sij[CellI] & Sij[CellI]));
+
+        // Compute tensors
+        Tij1_[CellI] = tScale[CellI] * Sij[CellI];
+        Tij2_[CellI] = tScale2[CellI] * symm((Sij[CellI] & Omegaij[CellI]) - (Omegaij[CellI] & Sij[CellI]));
+        Tij3_[CellI] = tScale3[CellI] * symm((Sij[CellI] & Sij[CellI]) & Omegaij[CellI] - Omegaij[CellI] & (Sij[CellI] & Sij[CellI]));
+        Tij4_[CellI] = tScale4[CellI] * symm((Omegaij[CellI] & Omegaij[CellI]) & Sij[CellI] - Sij[CellI] & (Omegaij[CellI] & Omegaij[CellI]));
+        Tij5_[CellI] = tScale5[CellI] * symm((Omegaij[CellI] & Omegaij[CellI]) & (Sij[CellI] & Sij[CellI]) - (Sij[CellI] & Sij[CellI]) & (Omegaij[CellI] & Omegaij[CellI]));
     }
 
-    dimensionedScalar nutMin("nutMin", dimensionSet(0, 2, -1, 0, 0, 0, 0), 1e-9);
 
-    // Calculate separation factor
-    volScalarField alpha_S(I1_ * 0.0);
-    if (separationCorrection_)
-    {
-        alpha_S = C0_
-                 + C1_*(I1_ - 2.86797085e-02) / 1.96630250e-02
-                 + C2_*(I2_ - -1.21140076e-02) / 1.83587958e-02;  // z-score standardisation
-    }
+    dimensionedScalar nutMin("nutMin", dimensionSet(0, 2, -1, 0, 0, 0 ,0), 1e-9);
+
+    volScalarField alpha1_separation(I1_ * 0.0);
+
+    // Separation Factor
+
+    // if (separationMode_.value() == 1.0)
+    // {
+    //     if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0)
+    //     {
+    //         C0_ = -1.08213;
+    //         C1_ = -0.377233;
+    //         C2_ = 0.062756;
+    //     }
+    //     separationLambda1_ = 1.0;
+    //     separationLambda2_ = 1.0;
+    // }
+
+    // if (separationMode_.value() == 2.0)
+    // {
+    //     if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0)
+    //     {
+    //         C0_ = -1.85884;
+    //         C1_ = 0.0626469;
+    //         C2_ = 0.0157284;
+    //     }
+    //     separationLambda1_ = 1.0;
+    //     separationLambda2_ = 1.0;
+    // }
+
+    // if (separationMode_.value() == 3.0)
+    // {
+    //     if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0 && separationLambda1_.value() == 0.0 && separationLambda2_.value() == 0.0)
+    //     {
+    //         C0_ = -0.252012;
+    //         C1_ = -0.441849;
+    //         C2_ = -0.0254661;
+    //         separationLambda1_ = 16.4685;
+    //         separationLambda2_ = 3.99033;
+    //     }
+    // }
+
+    // if (separationMode_.value() == 4.0)
+    // {
+    //     if (C0_.value() == 0.0 && C1_.value() == 0.0 && C2_.value() == 0.0 && separationLambda1_.value() == 0.0 && separationLambda2_.value() == 0.0)
+    //     {
+    //         C0_ = -0.872209;
+    //         C1_ = 0.0131861;
+    //         C2_ = -0.0766894;
+    //         separationLambda1_ = 20;
+    //         separationLambda2_ = 7.2513;
+    //     }
+    // }
+
+
+
+    // if (separationMode_.value() == 1.0 || separationMode_.value() == 3.0) // average between PH2800 and CBFS13700
+    // {
+        alpha1_separation = C0_
+                 + C1_*(I1_- (2.86797085e-02 + 3.22109598e-02) / 2.0) / ((1.96630250e-02 + 1.69618216e-02) / 2.0)
+                 + C2_*(I2_ - (-1.21140076e-02 -2.59699426e-02) / 2.0) / ((1.83587958e-02 + 1.65637539e-02) / 2.0);
+    // }
+
+
+    // if (separationMode_.value() == 2.0 || separationMode_.value() == 4.0)  // I1I2 for PH2800 + CBFS13700
+    // {
+
+    //     std::vector<float> Mean_Funcs_SEP ={0.0 , 3.04453342e-02, -1.90419751e-02,  1.26720478e-03, -7.63523411e-04,
+    //                                             7.16295213e-04,  5.66460407e-05, -3.35790350e-05,  3.07466925e-05,
+    //                                            -3.12439589e-05,  2.60333900e-06, -1.52808501e-06,  1.38771303e-06,
+    //                                            -1.38617717e-06,  1.49221337e-06,  1.21315469e-07, -7.07001591e-08,
+    //                                             6.39716068e-08, -6.34625036e-08,  6.73430685e-08, -7.66798242e-08,
+    //                                             5.69918377e-09, -3.30261711e-09,  2.98224267e-09, -2.94830635e-09,
+    //                                             3.10670530e-09,  3.10670530e-09, -3.48853434e-09};
+
+    //     // scalarList Std_Funcs(21);
+    //     std::vector<float> Std_Funcs_SEP ={1.0 , 1.84468535e-02, 1.88068710e-02, 9.98764762e-04, 8.97075822e-04,
+    //                                             9.89512270e-04, 4.99040063e-05, 4.30661244e-05, 4.64902807e-05,
+    //                                             5.69466498e-05, 2.44483400e-06, 2.06574320e-06, 2.20975847e-06,
+    //                                             2.64454589e-06, 3.66260083e-06, 1.18875010e-07, 9.91138283e-08,
+    //                                             1.05445583e-07, 1.24745863e-07, 1.68475795e-07, 2.61569539e-07,
+    //                                             5.75863939e-09, 4.75739289e-09, 5.04256885e-09, 5.92425621e-09,
+    //                                             7.89044848e-09, 7.89044848e-09, 1.19776568e-08};
+
+    //     // scalarList PC1_Coef(21);
+    //     std::vector<float> PC1_Coef_SEP =  {0.0 , 1.25216111e-01, -1.74322502e-01,  1.33197282e-01,
+    //                                             -1.96654511e-01,  2.02496020e-01,  1.34887383e-01,
+    //                                             -2.01363658e-01,  2.12796015e-01, -2.10940176e-01,
+    //                                              1.34807484e-01, -2.02309964e-01,  2.15034456e-01,
+    //                                             -2.17782965e-01,  2.04606963e-01,  1.34144487e-01,
+    //                                             -2.02056548e-01,  2.15135671e-01, -2.19542292e-01,
+    //                                              2.10492582e-01, -1.88316897e-01,  1.33293656e-01,
+    //                                             -2.01363397e-01,  2.14521855e-01, -2.19644094e-01,
+    //                                              2.12536909e-01,  2.12536909e-01, -1.93293536e-01};
+
+
+    //     // scalarList PC2_Coef(21);
+    //     std::vector<float> PC2_Coef_SEP =  {0.0 , -3.10667434e-01,  1.64116055e-03, -3.32279120e-01,
+    //                                              7.07945518e-02,  7.06067963e-02, -3.38522248e-01,
+    //                                              9.38708636e-02,  3.73264185e-02, -1.36784245e-01,
+    //                                             -3.40273942e-01,  1.04402282e-01,  2.28540667e-02,
+    //                                             -1.19414761e-01,  1.87050452e-01, -3.40405798e-01,
+    //                                              1.10250461e-01,  1.48061924e-02, -1.09713269e-01,
+    //                                              1.78667339e-01, -2.16418816e-01, -3.39892893e-01,
+    //                                              1.13907811e-01,  9.56852155e-03, -1.03226515e-01,
+    //                                              1.72454529e-01,  1.72454529e-01, -2.12910228e-01};
+
+    //     std::vector<float> Theta_SEP(Mean_Funcs_SEP.size(), 0.0);
+    //     for (int i = 0; i < Theta_SEP.size(); i++)
+    //     {
+    //         Theta_SEP[0] = Theta_SEP[0] - (C1_.value()*PC1_Coef_SEP[i] + C2_.value()*PC2_Coef_SEP[i])* Mean_Funcs_SEP[i]/Std_Funcs_SEP[i];
+    //         Theta_SEP[i] = (C1_.value()*PC1_Coef_SEP[i] + C2_.value()*PC2_Coef_SEP[i])/Std_Funcs_SEP[i];
+    //     }
+    //     Theta_SEP[0] = Theta_SEP[0] + C0_.value();
+    //     // Info << "Theta_SEP: " << Theta_SEP << endl;
+
+
+    //     alpha1_separation =   Theta_SEP[0]
+    //                         + Theta_SEP[1]*i1_ + Theta_SEP[2]*i2_
+    //                         + Theta_SEP[3]*pow(i1_,2.0) + Theta_SEP[4]*i1_*i2_ + Theta_SEP[5]*pow(i2_,2.0)
+    //                         + Theta_SEP[6]*pow(i1_,3.0) + Theta_SEP[7]*pow(i1_,2.0)*i2_ + Theta_SEP[8]*i1_*pow(i2_,2.0) + Theta_SEP[9]*pow(i2_,3.0)
+    //                         + Theta_SEP[10]*pow(i1_,4.0) + Theta_SEP[11]*pow(i1_,3.0)*i2_ + Theta_SEP[12]*pow(i1_,2.0)*pow(i2_,2.0) + Theta_SEP[13]*i1_*pow(i2_,3.0) + Theta_SEP[14]*pow(i2_,4.0)
+    //                         + Theta_SEP[15]*pow(i1_,5.0) + Theta_SEP[16]*pow(i1_,4.0)*i2_ + Theta_SEP[17]*pow(i1_,3.0)*pow(i2_,2.0) + Theta_SEP[18]*pow(i1_,2.0)*pow(i2_,3.0) + Theta_SEP[19]*i1_*pow(i2_,4.0) + Theta_SEP[20]*pow(i2_,5.0)
+    //                         + Theta_SEP[21]*pow(i1_,6.0) + Theta_SEP[22]*pow(i1_,5.0)*i2_ + Theta_SEP[23]*pow(i1_,4.0)*pow(i2_,2.0) + Theta_SEP[24]*pow(i1_,3.0)*pow(i2_,3.0) + Theta_SEP[25]*pow(i1_,2.0)*pow(i2_,4.0) + Theta_SEP[26]*i1_*pow(i2_,5.0) + Theta_SEP[27]*pow(i2_,6.0);
+
+    //     // separationFactor_ = pow(scalar(1)-nut*omega_/k_,SeparationPower_.value())*(alpha1_separation);
+    // }
 
     separationFactor_ = pow(
         max
         (
             min
             (
-                (scalar(1)-pow(nut*omega_/k_, lambda1_.value())),
+                (scalar(1)-pow(nut*omega_/k_, separationLambda1_.value())),
                 scalar(1)
             ),
             scalar(0)
-        ), lambda2_.value())*(alpha_S);
+        ),separationLambda2_.value())*(alpha1_separation);
 
-    // Calculate secondary flow factor
-    volScalarField alpha_A(I1_ * 0.0);
-    if (anisotropyCorrection_)
-    {
-        alpha_A = A0_
-                 + A1_*(I1_ - 4.13641572e-02) / 9.70441569e-03
-                 + A2_*(I2_ - -4.13023579e-02) / 9.75952414e-03;  // z-score standardisation
-    }
 
-    // Update Reynolds stress tensor
-    bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha_A*Tij2_) - bijDelta_)*anisotropyRelaxation_;
+
+
+
+
+
+//  Secondary Flow Calculations
+
+    volScalarField alpha2_secondary(I1_ * 0.0);
+
+    // if (secondaryMode_.value() == 1.0)
+    // {
+    //     if (A0_.value() == 0.0 && A1_.value() == 0.0 && A2_.value() == 0.0)
+    //     {
+    //         A0_ = -1.653279626929183;
+    //         A1_ = 0.6251856319378204;
+    //         A2_ = 0.9998609367402819;
+    //     }
+        alpha2_secondary = A0_
+                 + A1_ * (I1_- (4.13641572e-02)) / 9.70441569e-03
+                 + A2_ * (I2_ - (-4.13023579e-02)) / 9.75952414e-03;
+
+    // }
+
+    // if (secondaryMode_.value() == 2.0)
+    // {
+    //     if (A0_.value() == 0.0 && A1_.value() == 0.0 && A2_.value() == 0.0)
+    //     {
+    //         A0_ = -1.61278;
+    //         A1_ = 0.0744613;
+    //         A2_ = 0.0152856;
+    //     }
+
+    //     std::vector<float> Mean_Funcs ={0.0 , 4.07361637e-02, -4.06622382e-02, -2.26840875e-04,  7.56121923e-05,
+    //                                        -8.86716851e-04,  1.78739817e-03,  1.78171730e-03,  3.21617000e-07,
+    //                                         3.57357756e-08,  8.96210799e-07, -1.78451382e-03, -1.10427626e-05,
+    //                                         3.68087574e-06, -3.97537088e-05,  1.11014338e-05, -3.70043344e-06,
+    //                                         3.96981235e-05, -1.07206496e-07,  2.65303338e-07, -8.84337399e-08};
+
+    //     // scalarList Std_Funcs(21);
+    //     std::vector<float> Std_Funcs ={1.0 , 1.13120792e-02, 1.13269452e-02, 5.19769389e-04, 1.73258685e-04,
+    //                                         3.31578083e-04, 6.64376406e-04, 6.65801773e-04, 3.76274007e-07,
+    //                                         4.18091615e-08, 4.55532854e-07, 6.64990400e-04, 2.25476858e-05,
+    //                                         7.51597840e-06, 1.77336316e-05, 2.24959571e-05, 7.49873406e-06,
+    //                                         1.77460355e-05, 1.25426076e-07, 4.96889902e-07, 1.65631535e-07};
+
+    //     // scalarList PC1_Coef(21);
+    //     std::vector<float> PC1_Coef =  {0.0 , -2.02243623e-01,  2.03704260e-01,  2.38820097e-01,
+    //                                         -2.38822527e-01,  2.30314951e-01, -2.30856619e-01,
+    //                                         -2.31949199e-01, -1.30774177e-01, -1.30769020e-01,
+    //                                         -2.43145321e-01,  2.31445084e-01,  2.45458420e-01,
+    //                                         -2.45459807e-01,  2.40217847e-01, -2.44779753e-01,
+    //                                          2.44781156e-01, -2.40374857e-01,  1.30771600e-01,
+    //                                         -2.48576040e-01,  2.48577012e-01};
+
+
+    //     // scalarList PC2_Coef(21);
+    //     std::vector<float> PC2_Coef =  {0.0 , -2.65008897e-01,  2.61415953e-01, -2.33956132e-01,
+    //                                          2.33951526e-01,  2.51420539e-01, -2.52546533e-01,
+    //                                         -2.47383736e-01,  1.24902307e-01,  1.24895664e-01,
+    //                                         -2.04347009e-01,  2.49984607e-01, -2.30083943e-01,
+    //                                          2.30081804e-01,  2.27204329e-01,  2.29736516e-01,
+    //                                         -2.29734398e-01, -2.25321733e-01, -1.24898987e-01,
+    //                                          2.22372343e-01, -2.22371319e-01};
+
+
+
+
+    //     std::vector<float> Theta_(21, 0.0);
+    //     for (int i = 0; i < Theta_.size(); i++)
+    //     {
+    //         Theta_[0] = Theta_[0] - (A1_.value()*PC1_Coef[i] + A2_.value()*PC2_Coef[i])* Mean_Funcs[i]/Std_Funcs[i];
+    //         Theta_[i] = (A1_.value()*PC1_Coef[i] + A2_.value()*PC2_Coef[i])/Std_Funcs[i];
+    //     }
+    //     Theta_[0] = Theta_[0] + A0_.value();
+    //     //Info << "Theta_: " << Theta_ << endl;
+
+
+    //     alpha2_secondary =    Theta_[0]
+    //         + Theta_[1]*i1_ + Theta_[2]*i2_ + Theta_[3]*i3_ + Theta_[4]*i4_ + Theta_[5]*i5_
+    //         + Theta_[6]*i1_*i1_ + Theta_[7]*i2_*i2_ + Theta_[8]*i3_*i3_ + Theta_[9]*i4_*i4_ + Theta_[10]*i5_*i5_
+    //         + Theta_[11]*i1_*i2_ + Theta_[12]*i1_*i3_ + Theta_[13]*i1_*i4_ + Theta_[14]*i1_*i5_
+    //         + Theta_[15]*i2_*i3_ + Theta_[16]*i2_*i4_ + Theta_[17]*i2_*i5_
+    //         + Theta_[18]*i3_*i4_ + Theta_[19]*i3_*i5_
+    //         + Theta_[20]*i4_*i5_;
+    // }
+
+    bijDelta_ = bijDelta_ + ((nut*omega_/(k_ + this->kMin_))*(alpha2_secondary*Tij2_) - bijDelta_)*secondary_relaxation_;
+
     Rij_ = ((2.0/3.0)*I)*k_ - 2.0*nut*Sij + 2*k_*bijDelta_;
-
-    // Calculate production terms
     volSymmTensorField dAij(2*k_*bijDelta_);
     volSymmTensorField P(-twoSymm(dAij & gradU));
     volScalarField Pk_bijDelta_(0.5*tr(P));
 
-    // Calculate G/nu
+
+
+//  Continue with kOSST
+
+
+    // volScalarField::Internal GbyNu0
+    // (
+    //     this->type() + ":GbyNu",
+    //     // ((tgradU() && dev(twoSymm(tgradU()))) )
+    //     ( (tgradU() && dev(twoSymm(tgradU()))) )
+    // );
+
     volScalarField::Internal GbyNu0
     (
         this->type() + ":GbyNu",
-        ((tgradU() && dev(twoSymm(tgradU()))) + Pk_bijDelta_/(nut + nutMin))
+        // ((tgradU() && dev(twoSymm(tgradU()))) )
+        ( (tgradU() && dev(twoSymm(tgradU()))) + Pk_bijDelta_/(nut + nutMin) )
     );
 
+
     volScalarField::Internal G(this->GName(), nut*GbyNu0);
+    // const fvMesh& mesh1 = this->mesh_;
+    // volSymmTensorField& bijDelta = mesh1.lookupObjectRef<volSymmTensorField>("bijDelta");
 
     // Update omega and G at the wall
     omega_.boundaryFieldRef().updateCoeffs();
+
+
+
 
     volScalarField CDkOmega
     (
@@ -822,19 +1204,20 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
     volScalarField F1(this->F1(CDkOmega));
     volScalarField F23(this->F23());
 
-    // Solve omega equation
     {
         volScalarField::Internal gamma(this->gamma(F1));
         volScalarField::Internal beta(this->beta(F1));
 
         GbyNu0 = GbyNu(GbyNu0, F23(), S2());
+        // Turbulent frequency equation
         tmp<fvScalarMatrix> omegaEqn
         (
             fvm::ddt(alpha, rho, omega_)
           + fvm::div(alphaRhoPhi, omega_)
           - fvm::laplacian(alpha*rho*DomegaEff(F1), omega_)
          ==
-            alpha()*rho()*gamma*(GbyNu0 + GbyNu0*separationFactor_)
+            // alpha()*rho()*gamma*GbyNu0
+            alpha()*rho()*gamma*(GbyNu0+GbyNu0*separationFactor_)  // Cw1 F1 omega/k Pk
           - fvm::SuSp((2.0/3.0)*alpha()*rho()*gamma*divU, omega_)
           - fvm::Sp(alpha()*rho()*beta*omega_(), omega_)
           - fvm::SuSp
@@ -856,7 +1239,8 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
         bound(omega_, this->omegaMin_);
     }
 
-    // Solve k equation
+
+    // Turbulent kinetic energy equation
     tmp<fvScalarMatrix> kEqn
     (
         fvm::ddt(alpha, rho, k_)
@@ -870,6 +1254,7 @@ void kOmegaSSTPDABase<BasicEddyViscosityModel>::correct()
       + kSource()
       + fvOptions(alpha, rho, k_)
     );
+
 
     tgradU.clear();
 

@@ -7,7 +7,6 @@
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
     Copyright (C) 2017-2021 OpenCFD Ltd.
-    Copyright (C) 2023-2024 M. J. Rincón
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -28,39 +27,25 @@ License
 Class
     Foam::kOmegaSSTPDABase
 
-Group
-    grpRASTurbulence
-
 Description
-    Base class for the k-omega-SST-PDA turbulence model for
-    incompressible and compressible flows.
+    
+    This is the openFoam kOmegaSST model corrected with separation factor and secondary flow prediction,
+    Progressive data augmented (PDA) 2023, A. Amarloo, M. Rincon
 
-    The model includes:
-    - Separation factor correction
-    - Secondary flow prediction
-    - Progressive data augmentation (PDA)
-
-    References:
-    \verbatim
-        Rincon, M. J., Reclari, M., Yang, X. I. A., & Abkar, M. (2025).
-        A generalisable data-augmented turbulence model with progressive 
-        and interpretable corrections.
-        arXiv preprint arXiv:2503.18568.
-
-        Amarloo, A., Rincon, M. J., Reclari, M., & Abkar, M. (2023).
-        Progressive augmentation of RANS models for separated flow prediction
-        by CFD-driven surrogate multi-objective optimisation.
-
-        Rincon, M. J., Amarloo, A., Reclari, M., Yang, X. I. A., & Abkar, M. (2023).
-        Progressive augmentation of Reynolds stress tensor models for secondary flow prediction
-        by computational fluid dynamics driven surrogate optimisation.
-    \endverbatim
-
-    The model coefficients are:
+    More details and test cases in following publications:
+    A. Amarloo, M. J. Rincon, M. Reclari, and M. Abkar, 
+    "Progressive augmentation of RANS models for separated flow prediction
+    by CFD-driven surrogate multi-objective optimisation." (2023).
+    and
+    M. J. Rincon, A. Amarloo,  M. Reclari, X.I.A. Yang, and M. Abkar, 
+    "Progressive augmentation of Reynolds stress tensor models for secondary flow prediction 
+    by computational fluid dynamics driven surrogate optimisation" (2023).
+    
+    The model coefficients  are
     \verbatim
         kOmegaSSTPDABaseCoeffs
         {
-            // Original k-omega-SST coefficients
+            //original coefficients of KOSST
             alphaK1         0.85;
             alphaK2         1.0;
             alphaOmega1     0.5;
@@ -75,33 +60,32 @@ Description
             c1              10.0;
             F3              no;
 
-            // Separation correction coefficients
-            separationCorrection      true;
-            lambda1                  18.622;
-            lambda2                  4.698;
-            C0                       -2.070;
-            C1                        1.119;
-            C2                       -0.215;
 
-            // Secondary flow coefficients
-            anisotropyCorrection       true;
-            A0                       -1.584;
-            A1                       -0.685;
-            A2                       -0.178;
-            anisotropyRelaxation      0.5;
+            //Separation coefficients
+            separationMode      4;              //optional - default:4 - off:0 | ModelI:1 | ModelII:2 | ModelIII:3 | ModelIV:4
+            separationLambda1   1;              //optional - default taken from separationMode 4
+            separationLambda2   1;              //optional - default taken from separationMode 4
+            C0                  -1;             //optional - default taken from separationMode 4
+            C1                  0;              //optional - default taken from separationMode 4
+            C2                  0;              //optional - default taken from separationMode 4
+
+
+            //Secodnary Flow coefficients
+            secondaryMode       2;              //optional - default:2 - off:0 | ModelI:1 | ModelII:2
+            A0                  -1;             //optional - default taken from secondaryMode 2
+            A1                  0;              //optional - default taken from secondaryMode 2
+            A2                  0;              //optional - default taken from secondaryMode 2
+
 
             // Optional decay control
             decayControl    yes;
-            kInf            <far-field k value>;
-            omegaInf        <far-field omega value>;
+            kInf            \<far-field k value\>;
+            omegaInf        \<far-field omega value\>;
         }
     \endverbatim
 
 SourceFiles
     kOmegaSSTPDABase.C
-
-SeeAlso
-    kOmegaSSTPDA.H
 
 \*---------------------------------------------------------------------------*/
 
@@ -155,21 +139,25 @@ protected:
             dimensionedScalar b1_;
             dimensionedScalar c1_;
 
-            Switch separationCorrection_;
-            dimensionedScalar lambda1_;
-            dimensionedScalar lambda2_;
+
+            dimensionedScalar separationMode_;
+            dimensionedScalar separationLambda1_;
+            dimensionedScalar separationLambda2_;
             dimensionedScalar C0_;
             dimensionedScalar C1_;
             dimensionedScalar C2_;
 
-            Switch anisotropyCorrection_;
-            dimensionedScalar anisotropyRelaxation_;
+
+            dimensionedScalar secondaryMode_;
+            dimensionedScalar secondary_relaxation_;
             dimensionedScalar A0_;
             dimensionedScalar A1_;
             dimensionedScalar A2_;
 
+
             //- Flag to include the F3 term
             Switch F3_;
+
 
         // Fields
 
@@ -183,6 +171,23 @@ protected:
             volScalarField separationFactor_;
             volSymmTensorField bijDelta_;
             volSymmTensorField Rij_;
+
+            // Added by Mario
+            volSymmTensorField Sij_;
+            volTensorField Omegaij_;
+
+            volScalarField I1_;
+            volScalarField I2_;
+            volScalarField I3_;
+            volScalarField I4_;
+            volScalarField I5_;
+
+            volSymmTensorField Tij1_;
+            volSymmTensorField Tij2_;
+            volSymmTensorField Tij3_;
+            volSymmTensorField Tij4_;
+            volSymmTensorField Tij5_;
+                
         // Decay control
 
             //- Flag to include the decay control
