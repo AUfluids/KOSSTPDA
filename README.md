@@ -1,4 +1,4 @@
-# KOSSTPDA
+# kOmegaSSTPDA
 A generalisable data-augmented k-omega SST model with progressive and interpretable corrections for OpenFOAM. Developed by Rincón et al. 2025 and the Fluid Physics & Turbulence research group at Aarhus University.
 
 ## Table of Contents
