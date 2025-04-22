@@ -58,7 +58,7 @@ The k-omega-SST-PDA model is a progressive data-augmented turbulence model that 
      ```
 
 ## Usage
-1. Add required library to `controlDict`:
+1. Add the required library to `controlDict`:
    - For incompressible flow:
      ```
      libs ( "libPDAIncompressibleTurbulenceModels" );
@@ -81,7 +81,7 @@ The k-omega-SST-PDA model is a progressive data-augmented turbulence model that 
    }
    ```
 
-> **Note**: If the solution does not converge at firs, it is recommended to first run your case with standard kOmegaSST before switching to kOmegaSSTPDA.
+> **Note**: If the solution does not converge at first, it is recommended to first run your case with standard kOmegaSST before switching to kOmegaSSTPDA.
 
 ## Model Configuration
 ### Mode Selection
@@ -95,7 +95,7 @@ If you use false in both corrections, the PDA model is deactivated, and the stan
 
 ### Optional Stability Settings
 In case of stability and convergence issues, we also suggest the following setting for the new model to be tested.
-Otherwise, these coefficients are automatically assigned with values corresponding to the optimised model.
+Otherwise, these coefficients are automatically assigned values corresponding to the optimised model.
 
    ```
    // Separation Flow coefficients
@@ -125,7 +125,7 @@ The model has been validated across multiple test cases:
 ### Anisotropy-induced Secondary Flow Cases
 - Duct flow (AR = 1, Reb = 3500)
 - Duct flow (AR = 3, Reb = 2600)
-- Roughness induced atmospheric boundary layer flows
+- Roughness-induced atmospheric boundary layer flows
 
 ### Results
 #### Law-of-the-wall
