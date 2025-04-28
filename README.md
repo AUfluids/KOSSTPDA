@@ -144,7 +144,7 @@ Results for duct flow (AR = 1, Reb = 3500):
 ![Reynolds Stress Profiles](https://github.com/AUfluids/KOSSTPDA/blob/main/testCases/SD_ReB3500_AR1/profiles_comparison_Rij_SD_ReB3500_AR1.png)
 
 ## Target platform
-The code is known to work with OpenFOAM-v2412 and previous ESI versions.
+The code is known to work with OpenFOAM-v2406 and previous ESI versions.
 
 ## Authors
 Mario Javier Rincón <mjrp@mpe.au.dk>
